@@ -6,6 +6,8 @@ namespace Player
 {
     public class PlayerController : MonoBehaviour
     {
+        [SerializeField] private float deadZone = .4f;
+
         PlayerInputs playerInputs;
         PlayerHealth playerHealth;
         PlayerCombat playerCombat;
@@ -46,6 +48,11 @@ namespace Player
             playerInputs.ActivatePlayerInputs();
         }
 
+        public void DisablePlayerInputs()
+        {
+            playerInputs.DectivatePlayerInputs();
+        }
+
         public void PlayAnimation(AnimationsList animation)
         {
             playerAnimations.Play(animation);
@@ -73,6 +80,11 @@ namespace Player
         public bool GetGroundCollision()
         {
             return playerCollision.GetIsGrounded();
+        }
+
+        public float GetDeadZone()
+        {
+            return deadZone;
         }
     }
 }

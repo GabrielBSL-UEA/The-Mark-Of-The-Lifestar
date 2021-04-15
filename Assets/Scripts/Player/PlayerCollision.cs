@@ -8,6 +8,7 @@ namespace Player
     {
         private PlayerController playerController;
         private BoxCollider2D boxCol2D;
+        private Rigidbody2D rb;
 
         [SerializeField] private LayerMask groundLayerMask;
         [SerializeField] private float coyoteTime = .05f;
@@ -19,15 +20,18 @@ namespace Player
 
         private void Awake()
         {
+            rb = GetComponent<Rigidbody2D>();
             boxCol2D = GetComponent<BoxCollider2D>();
             playerController = GetComponent<PlayerController>();
         }
 
         private void FixedUpdate()
         {
+            isWallSliding = IsWallSliding();
+
             if (!IsGrounded())
             {
-                if(coyoteTimer >= coyoteTime)isGrounded = IsGrounded();
+                if(coyoteTimer >= coyoteTime)isGrounded = false;
                 else
                 {
                     coyoteTimer += Time.fixedDeltaTime;
@@ -36,11 +40,9 @@ namespace Player
             }
             else
             {
-                isGrounded = IsGrounded();
+                isGrounded = true;
                 coyoteTimer = 0;
             }
-
-            isWallSliding = IsWallSliding();
         }
 
         private bool IsGrounded()
@@ -50,7 +52,7 @@ namespace Player
 
             bool collisionDetected = rayHit.collider != null;
 
-            if (collisionDetected && !isGrounded) playerController.ResetInputCounters();
+            if (collisionDetected && rb.velocity.y <= 0 && !isGrounded) playerController.ResetInputCounters();
 
             return collisionDetected;
         }
@@ -64,7 +66,10 @@ namespace Player
 
             bool collisionDetected = rayHit.collider != null;
 
-            if (collisionDetected && !isGrounded && Mathf.Abs(playerMovement.x) > 0) return true;
+            if (collisionDetected && !IsGrounded() && (Mathf.Abs(playerMovement.x) > 0 || isWallSliding))
+            {
+                return true;
+            }
             
             return false;
         }

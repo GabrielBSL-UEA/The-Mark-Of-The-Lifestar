@@ -26,6 +26,7 @@ namespace Player
     {
         private Rigidbody2D rb;
         private Animator anim;
+        private PlayerController playerController;
 
         private bool facingRight = true;
         private AnimationsList currentAnimation;
@@ -33,6 +34,7 @@ namespace Player
         // Start is called before the first frame update
         private void Awake()
         {
+            playerController = GetComponent<PlayerController>();
             rb = GetComponent<Rigidbody2D>();
             anim = GetComponent<Animator>();
         }
@@ -40,12 +42,15 @@ namespace Player
         // Update is called once per frame
         void Update()
         {
-            if (rb.velocity.x > 0 && !facingRight) Flip(true);
-            else if (rb.velocity.x < 0 && facingRight) Flip(false);
+            float direction = playerController.GetMovementInputs().x;
+
+            if (Mathf.Abs(direction) > playerController.GetDeadZone()) Flip(direction > 0);
         }
 
         private void Flip(bool right)
         {
+            if (facingRight == right) return;
+
             Vector2 scaler = transform.localScale;
             scaler.x *= -1;
             transform.localScale = scaler;

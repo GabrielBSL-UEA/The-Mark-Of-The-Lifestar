@@ -20,6 +20,7 @@ namespace Player
 
         [Header("Dash")]
         [SerializeField] private int airDashes = 1;
+
         private float jumpHoldTime = 0;
         private float jumpBufferTimer = 0;
         private int airJumpCounter = 0;
@@ -30,6 +31,7 @@ namespace Player
         private bool jumpHolded = false;
         private bool hasJumped = false;
         private bool hasPressedJump = false;
+        private bool jumpBuffer = false;
         private bool dashPerfomed = false;
 
         private void Awake()
@@ -71,18 +73,20 @@ namespace Player
             {
                 jumpBufferTimer = 0;
                 hasPressedJump = true;
+                jumpBuffer = true;
             }
 
             else if (ctx.canceled)
             {
                 jumpHolded = false;
+                jumpBuffer = false;
                 StartCoroutine(JumpReleasedDelay(minimalJumpTime - jumpHoldTime));
             }
         }
 
         private void ConfirmJump()
         {
-            jumpHolded = true;
+            jumpHolded = jumpBuffer;
             hasJumped = true;
             hasPressedJump = false;
             jumpBufferTimer = 0;
@@ -113,7 +117,6 @@ namespace Player
             {
                 dashPerfomed = true;
                 dashDirectionCache = movementDirection;
-                inputActions.Disable();
             }
         }
 
@@ -141,6 +144,11 @@ namespace Player
         {
             dashPerfomed = false;
             inputActions.Enable();
+        }
+
+        public void DectivatePlayerInputs()
+        {
+            inputActions.Disable();
         }
 
         //-----------------------------------------------------------------
