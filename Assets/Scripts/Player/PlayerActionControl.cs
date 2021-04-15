@@ -126,7 +126,7 @@ namespace Player
                 {
                     ""name"": ""Keyboard (Arrows)"",
                     ""id"": ""5f9d2882-db46-4846-a38c-dafd4e805b19"",
-                    ""path"": ""2DVector"",
+                    ""path"": ""2DVector(mode=1)"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -181,7 +181,7 @@ namespace Player
                 {
                     ""name"": ""Keyboard (WASD)"",
                     ""id"": ""1a9f9967-2be6-4fdf-94e1-7f8190477afe"",
-                    ""path"": ""2DVector"",
+                    ""path"": ""2DVector(mode=1)"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

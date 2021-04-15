@@ -97,10 +97,7 @@ namespace Player
 
         private bool CanJump()
         {
-            if (playerController.GetGroundCollision() || playerController.GetWallSliding())
-            {
-                return true;
-            }
+            if (playerController.GetGroundCollision() || playerController.GetWallSliding()) return true;
             else if (airJumpCounter < airJumps)
             {
                 airJumpCounter++;
@@ -122,10 +119,7 @@ namespace Player
 
         private bool canDash()
         {
-            if (playerController.GetGroundCollision())
-            {
-                return true;
-            }
+            if (playerController.GetGroundCollision()) return true;
             else if (airDashCounter < airDashes)
             {
                 airDashCounter++;
@@ -135,7 +129,7 @@ namespace Player
             return false;
         }
 
-        public void ResetCountersOnGround()
+        public void ResetInputCounters()
         {
             if (dashPerfomed) return;
 

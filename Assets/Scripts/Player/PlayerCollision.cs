@@ -13,7 +13,7 @@ namespace Player
         [SerializeField] private float coyoteTime = .05f;
         [SerializeField] private float collisionDetectionOffset;
 
-        private float jumpExtentionTimer = 0;
+        private float coyoteTimer = 0;
         private bool isGrounded;
         private bool isWallSliding;
 
@@ -25,26 +25,22 @@ namespace Player
 
         private void FixedUpdate()
         {
-            isWallSliding = IsWallSliding();
-
             if (!IsGrounded())
             {
-                if(jumpExtentionTimer >= coyoteTime)
-                {
-                    isGrounded = IsGrounded();
-                }
+                if(coyoteTimer >= coyoteTime)isGrounded = IsGrounded();
                 else
                 {
-                    jumpExtentionTimer += Time.fixedDeltaTime;
+                    coyoteTimer += Time.fixedDeltaTime;
                     isGrounded = true;
                 }
             }
-
             else
             {
                 isGrounded = IsGrounded();
-                jumpExtentionTimer = 0;
+                coyoteTimer = 0;
             }
+
+            isWallSliding = IsWallSliding();
         }
 
         private bool IsGrounded()
@@ -54,7 +50,7 @@ namespace Player
 
             bool collisionDetected = rayHit.collider != null;
 
-            if (collisionDetected && !isGrounded) playerController.ResetAirJumps();
+            if (collisionDetected && !isGrounded) playerController.ResetInputCounters();
 
             return collisionDetected;
         }

@@ -11,9 +11,11 @@ namespace Player
         PlayerCombat playerCombat;
         PlayerMovement playerMovement;
         PlayerCollision playerCollision;
+        PlayerAnimations playerAnimations;
 
         private void Awake()
         {
+            playerAnimations = GetComponent<PlayerAnimations>();
             playerCollision = GetComponent<PlayerCollision>();
             playerMovement = GetComponent<PlayerMovement>();
             playerInputs = GetComponent<PlayerInputs>();
@@ -25,7 +27,7 @@ namespace Player
         {
             if (playerMovement.enabled)
             {
-                playerMovement.MovementInterpreter(
+                playerMovement.movementTranslator(
                     playerInputs.GetMovementDirection(),
                     playerInputs.GetJumpHoldValue(),
                     playerInputs.GetHasJumped(),
@@ -33,6 +35,25 @@ namespace Player
                     playerCollision.GetIsWallSliding());
             }
         }
+
+        public void ResetInputCounters()
+        {
+            playerInputs.ResetInputCounters();
+        }
+
+        public void EnablePlayerInputs()
+        {
+            playerInputs.ActivatePlayerInputs();
+        }
+
+        public void PlayAnimation(AnimationsList animation)
+        {
+            playerAnimations.Play(animation);
+        }
+
+        //-----------------------------------------------------------------
+        //**********                Get Functions                **********
+        //-----------------------------------------------------------------
 
         public Vector2 GetMovementInputs()
         {
@@ -52,16 +73,6 @@ namespace Player
         public bool GetGroundCollision()
         {
             return playerCollision.GetIsGrounded();
-        }
-
-        public void ResetAirJumps()
-        {
-            playerInputs.ResetCountersOnGround();
-        }
-
-        public void EnablePlayerInputs()
-        {
-            playerInputs.ActivatePlayerInputs();
         }
     }
 }
