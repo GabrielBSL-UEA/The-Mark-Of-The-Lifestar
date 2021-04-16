@@ -19,10 +19,12 @@ namespace Player
         [SerializeField] private int airJumps = 1;
 
         [Header("Dash")]
+        [SerializeField] private float dashBufferTime = .2f;
         [SerializeField] private int airDashes = 1;
 
         private float jumpHoldTime = 0;
         private float jumpBufferTimer = 0;
+        private float dashBufferTimer = 0;
         private int airJumpCounter = 0;
         private int airDashCounter = 0;
 
@@ -33,6 +35,8 @@ namespace Player
         private bool hasPressedJump = false;
         private bool jumpBuffer = false;
         private bool dashPerfomed = false;
+        private bool hasPressedDash = false;
+        private bool hasPressedAttack = false;
 
         private void Awake()
         {
@@ -47,6 +51,9 @@ namespace Player
 
             inputActions.Land.Dash.performed += ctx => Dash(ctx);
             inputActions.Land.Dash.canceled += ctx => Dash(ctx);
+
+            inputActions.Land.Attack.performed += ctx => Attack(ctx);
+            inputActions.Land.Attack.canceled += ctx => Attack(ctx);
         }
 
         private void OnEnable()
@@ -65,6 +72,9 @@ namespace Player
 
             if(jumpBufferTimer < jumpBufferTime && hasPressedJump && CanJump()) ConfirmJump();
             else jumpBufferTimer += Time.deltaTime;
+
+            if (dashBufferTimer < dashBufferTime && hasPressedDash && canDash()) ConfirmDash();
+            else dashBufferTimer += Time.deltaTime;
         }
         
         public void Jump(CallbackContext ctx)
@@ -93,6 +103,14 @@ namespace Player
             jumpHoldTime = 0;
         }
 
+        private void ConfirmDash()
+        {
+            dashBufferTimer = 0;
+            dashPerfomed = true;
+            hasPressedDash = false;
+            dashDirectionCache = movementDirection;
+        }
+
         IEnumerator JumpReleasedDelay(float time)
         {
             yield return new WaitForSeconds(time);
@@ -113,15 +131,17 @@ namespace Player
 
         private void Dash(CallbackContext ctx)
         {
-            if (canDash() && ctx.performed)
+            if (ctx.performed)
             {
-                dashPerfomed = true;
-                dashDirectionCache = movementDirection;
+                dashBufferTimer = 0;
+                hasPressedDash = true;
             }
         }
 
         private bool canDash()
         {
+            if (playerController.GetDashDelayTimer() > 0 || playerController.GetPlayerIsAttacking()) return false;
+
             if (playerController.GetGroundCollision()) return true;
             else if (airDashCounter < airDashes)
             {
@@ -132,6 +152,14 @@ namespace Player
             return false;
         }
 
+        public void Attack(CallbackContext ctx)
+        {
+            if (ctx.performed)
+            {
+                hasPressedAttack = true;
+            }
+        }
+
         public void ResetInputCounters()
         {
             if (dashPerfomed) return;
@@ -140,15 +168,14 @@ namespace Player
             airDashCounter = 0;
         }
 
-        public void ActivatePlayerInputs()
+        public void ActivatePlayerInputs(bool value)
         {
-            dashPerfomed = false;
-            inputActions.Enable();
-        }
-
-        public void DectivatePlayerInputs()
-        {
-            inputActions.Disable();
+            if (value)
+            {
+                dashPerfomed = false;
+                inputActions.Enable();
+            }
+            else inputActions.Disable();
         }
 
         //-----------------------------------------------------------------
@@ -178,6 +205,14 @@ namespace Player
         public bool GetDashPerfomed()
         {
             return dashPerfomed;
+        }
+
+        public bool GetHasPressedAttack()
+        {
+            bool attack = hasPressedAttack;
+            hasPressedAttack = false;
+
+            return attack;
         }
     }
 }

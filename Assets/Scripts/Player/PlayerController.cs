@@ -27,14 +27,22 @@ namespace Player
 
         private void FixedUpdate()
         {
+            if (playerCombat.enabled)
+            {
+                playerCombat.RecieveAttackInput(
+                    playerInputs.GetHasPressedAttack(),
+                    playerMovement.GetIsDashing());
+            }
+
             if (playerMovement.enabled)
             {
-                playerMovement.movementTranslator(
+                playerMovement.MovementTranslator(
                     playerInputs.GetMovementDirection(),
                     playerInputs.GetJumpHoldValue(),
                     playerInputs.GetHasJumped(),
                     playerInputs.GetDashPerfomed(),
-                    playerCollision.GetIsWallSliding());
+                    playerCollision.GetIsWallSliding(),
+                    playerCombat.GetIsAttacking());
             }
         }
 
@@ -43,19 +51,39 @@ namespace Player
             playerInputs.ResetInputCounters();
         }
 
-        public void EnablePlayerInputs()
-        {
-            playerInputs.ActivatePlayerInputs();
-        }
-
-        public void DisablePlayerInputs()
-        {
-            playerInputs.DectivatePlayerInputs();
-        }
-
         public void PlayAnimation(AnimationsList animation)
         {
             playerAnimations.Play(animation);
+        }
+
+        public void EnablePlayerInputs(bool value)
+        {
+            playerInputs.ActivatePlayerInputs(value);
+        }
+
+        public void EnablePlayerMovements(bool value)
+        {
+            if (playerMovement.enabled == value) return;
+            playerMovement.enabled = value;
+        }
+
+        //-----------------------------------------------------------------
+        //**********              Animation Calls                **********
+        //-----------------------------------------------------------------
+
+        public void EnableAttackBuffer()
+        {
+            playerCombat.ActivateAttackBuffer();
+        }
+
+        public void RegisterAttackHits()
+        {
+            playerCombat.DetectHits();
+        }
+
+        public void AttackTransitionEnds()
+        {
+            playerCombat.OnTransitionEnd();
         }
 
         //-----------------------------------------------------------------
@@ -70,6 +98,16 @@ namespace Player
         public Vector2 GetDashDirection()
         {
             return playerInputs.GetDashDirectionCache();
+        }
+
+        public float GetDashDelayTimer()
+        {
+            return playerMovement.GetDashDelayRemaining();
+        }
+
+        public bool GetPlayerIsAttacking()
+        {
+            return playerCombat.GetIsAttacking();
         }
 
         public bool GetWallSliding()

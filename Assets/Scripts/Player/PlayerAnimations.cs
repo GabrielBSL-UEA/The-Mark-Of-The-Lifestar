@@ -9,6 +9,7 @@ namespace Player
         p_idle,
         p_run,
         p_attack_1,
+        p_attack_1_transition,
         p_attack_2,
         p_jump,
         p_jump_to_fall,
@@ -44,7 +45,7 @@ namespace Player
         {
             float direction = playerController.GetMovementInputs().x;
 
-            if (Mathf.Abs(direction) > playerController.GetDeadZone()) Flip(direction > 0);
+            if (Mathf.Abs(direction) > playerController.GetDeadZone() && !playerController.GetPlayerIsAttacking()) Flip(direction > 0);
         }
 
         private void Flip(bool right)
@@ -61,7 +62,7 @@ namespace Player
         {
             if (currentAnimation.Equals(animation)) return;
 
-            //Exceçoes
+            //Exceções
             if (animation == AnimationsList.p_jump_to_fall && currentAnimation == AnimationsList.p_fall) return;
             if (animation == AnimationsList.p_dash_start && currentAnimation == AnimationsList.p_dash) return;
 

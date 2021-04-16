@@ -43,6 +43,14 @@ namespace Player
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": ""Press""
+                },
+                {
+                    ""name"": ""Attack"",
+                    ""type"": ""Button"",
+                    ""id"": ""fad46e58-389e-449e-ac64-0e8a882b8c11"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press""
                 }
             ],
             ""bindings"": [
@@ -232,6 +240,28 @@ namespace Player
                     ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""61738b7d-97cd-465d-b032-3ae6b5aeeeeb"",
+                    ""path"": ""<Keyboard>/z"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f0be6241-c52c-4710-a00b-e70f43b4410f"",
+                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -243,6 +273,7 @@ namespace Player
             m_Land_Move = m_Land.FindAction("Move", throwIfNotFound: true);
             m_Land_Jump = m_Land.FindAction("Jump", throwIfNotFound: true);
             m_Land_Dash = m_Land.FindAction("Dash", throwIfNotFound: true);
+            m_Land_Attack = m_Land.FindAction("Attack", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -295,6 +326,7 @@ namespace Player
         private readonly InputAction m_Land_Move;
         private readonly InputAction m_Land_Jump;
         private readonly InputAction m_Land_Dash;
+        private readonly InputAction m_Land_Attack;
         public struct LandActions
         {
             private @PlayerActionControl m_Wrapper;
@@ -302,6 +334,7 @@ namespace Player
             public InputAction @Move => m_Wrapper.m_Land_Move;
             public InputAction @Jump => m_Wrapper.m_Land_Jump;
             public InputAction @Dash => m_Wrapper.m_Land_Dash;
+            public InputAction @Attack => m_Wrapper.m_Land_Attack;
             public InputActionMap Get() { return m_Wrapper.m_Land; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -320,6 +353,9 @@ namespace Player
                     @Dash.started -= m_Wrapper.m_LandActionsCallbackInterface.OnDash;
                     @Dash.performed -= m_Wrapper.m_LandActionsCallbackInterface.OnDash;
                     @Dash.canceled -= m_Wrapper.m_LandActionsCallbackInterface.OnDash;
+                    @Attack.started -= m_Wrapper.m_LandActionsCallbackInterface.OnAttack;
+                    @Attack.performed -= m_Wrapper.m_LandActionsCallbackInterface.OnAttack;
+                    @Attack.canceled -= m_Wrapper.m_LandActionsCallbackInterface.OnAttack;
                 }
                 m_Wrapper.m_LandActionsCallbackInterface = instance;
                 if (instance != null)
@@ -333,6 +369,9 @@ namespace Player
                     @Dash.started += instance.OnDash;
                     @Dash.performed += instance.OnDash;
                     @Dash.canceled += instance.OnDash;
+                    @Attack.started += instance.OnAttack;
+                    @Attack.performed += instance.OnAttack;
+                    @Attack.canceled += instance.OnAttack;
                 }
             }
         }
@@ -342,6 +381,7 @@ namespace Player
             void OnMove(InputAction.CallbackContext context);
             void OnJump(InputAction.CallbackContext context);
             void OnDash(InputAction.CallbackContext context);
+            void OnAttack(InputAction.CallbackContext context);
         }
     }
 }

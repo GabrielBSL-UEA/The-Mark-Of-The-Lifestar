@@ -21,12 +21,14 @@ namespace Player
 
         private int facingDirection = 1;
         private float dashTimer = 0;
+        private float dashDelayTimer = 0;
         private float wallJumpDirection = 0;
         private float wallJumpXImpulseTimer = Mathf.Infinity;
         private bool antiWallJumpOnFirstContactWhilePressingJump = false;
         private bool reverseDash = false;
 
         private bool isDashing = false;
+        private bool isAttacking = false;
         private bool isWallSliding = false;
         private bool isWallJumping = false;
 
@@ -37,6 +39,7 @@ namespace Player
         [Header("Dash")]
         [SerializeField] private float dashSpeed;
         [SerializeField] private float dashDuration;
+        [SerializeField] private float dashDelay = .2f;
         [SerializeField] private DashAllDirections dashAllDirections;
 
         [Header("Fall")]
@@ -55,7 +58,14 @@ namespace Player
 
         private void Update()
         {
-            AnimationCall();
+            if (dashDelayTimer > 0) dashDelayTimer -= Time.deltaTime;
+
+            if (!isAttacking) AnimationCall();
+        }
+
+        private void FixedUpdate()
+        {
+            if (isDashing) dashTimer += Time.fixedDeltaTime;
         }
 
         private void AnimationCall()
@@ -68,8 +78,11 @@ namespace Player
             else playerController.PlayAnimation(AnimationsList.p_idle);
         }
 
-        public void movementTranslator(Vector2 movementDirection, bool jumpHolded, bool jumpPressed, bool dashPerfomed, bool wallSliding)
+        public void MovementTranslator(Vector2 movementDirection, bool jumpHolded, bool jumpPressed, bool dashPerfomed, bool wallSliding, bool attacking)
         {
+            isAttacking = attacking;
+            if (isAttacking) return;
+
             if(jumpPressed && !wallSliding) antiWallJumpOnFirstContactWhilePressingJump = false;
             else if (!jumpPressed && wallSliding) antiWallJumpOnFirstContactWhilePressingJump = true;
 
@@ -118,7 +131,7 @@ namespace Player
 
             if (dashTimer == 0)
             {
-                playerController.DisablePlayerInputs();
+                playerController.EnablePlayerInputs(false);
                 dashDirecton = playerController.GetDashDirection();
                 reverseDash = wallSliding;
             }
@@ -126,12 +139,12 @@ namespace Player
             if (dashTimer > dashDuration)
             {
                 isDashing = false;
-                playerController.EnablePlayerInputs();
+                dashDelayTimer = dashDelay;
+                playerController.EnablePlayerInputs(true);
                 dashTimer = 0;
             }
             else
             {
-                dashTimer += Time.fixedDeltaTime;
 
                 if (Mathf.Abs(dashDirecton.x) < playerController.GetDeadZone() && Mathf.Abs(dashDirecton.y) < playerController.GetDeadZone())
                     rb.velocity = Vector2.right * facingDirection * dashSpeed;
@@ -212,6 +225,20 @@ namespace Player
         {
             if (jumpHolded) rb.velocity = Vector2.up * jumpForce;
             else if (rb.velocity.y > 0 && !jumpPressed) rb.velocity = new Vector2(rb.velocity.x, 0);
+        }
+
+        //-----------------------------------------------------------------
+        //**********                Get Functions                **********
+        //-----------------------------------------------------------------
+
+        public float GetDashDelayRemaining()
+        {
+            return dashDelayTimer;
+        }
+
+        public bool GetIsDashing()
+        {
+            return isDashing;
         }
     }
 }
