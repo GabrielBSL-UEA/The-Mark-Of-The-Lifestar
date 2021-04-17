@@ -6,9 +6,6 @@ namespace Enemy
 {
     public class EnemyHitTest : MonoBehaviour
     {
-        public void RegisterHit()
-        {
-            Debug.Log("hit");
-        }
+        
     }
 }

@@ -27,6 +27,8 @@ namespace Player
 
         private void FixedUpdate()
         {
+            if (!playerHealth.GetIsAlive()) return;
+
             if (playerCombat.enabled)
             {
                 playerCombat.RecieveAttackInput(
@@ -51,7 +53,7 @@ namespace Player
             playerInputs.ResetInputCounters();
         }
 
-        public void PlayAnimation(AnimationsList animation)
+        public void PlayAnimation(PlayerAnimationsList animation)
         {
             playerAnimations.Play(animation);
         }
@@ -81,6 +83,11 @@ namespace Player
             playerCombat.DetectHits();
         }
 
+        public void AttackTransitionStart()
+        {
+            playerCombat.OnTransitionStart();
+        }
+
         public void AttackTransitionEnds()
         {
             playerCombat.OnTransitionEnd();
@@ -98,6 +105,11 @@ namespace Player
         public Vector2 GetDashDirection()
         {
             return playerInputs.GetDashDirectionCache();
+        }
+
+        public float GetFacingDirection()
+        {
+            return playerMovement.GetFacingDirection();
         }
 
         public float GetDashDelayTimer()

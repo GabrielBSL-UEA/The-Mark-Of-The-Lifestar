@@ -59,23 +59,19 @@ namespace Player
         private void Update()
         {
             if (dashDelayTimer > 0) dashDelayTimer -= Time.deltaTime;
+            if (isDashing) dashTimer += Time.deltaTime;
 
             if (!isAttacking) AnimationCall();
         }
 
-        private void FixedUpdate()
-        {
-            if (isDashing) dashTimer += Time.fixedDeltaTime;
-        }
-
         private void AnimationCall()
         {
-            if (isDashing) playerController.PlayAnimation(AnimationsList.p_dash_start);
-            else if (isWallSliding) playerController.PlayAnimation(AnimationsList.p_wall_slide);
-            else if (rb.velocity.y > 0) playerController.PlayAnimation(AnimationsList.p_jump);
-            else if (rb.velocity.y < 0) playerController.PlayAnimation(AnimationsList.p_jump_to_fall);
-            else if (rb.velocity.x != 0) playerController.PlayAnimation(AnimationsList.p_run);
-            else playerController.PlayAnimation(AnimationsList.p_idle);
+            if (isDashing) playerController.PlayAnimation(PlayerAnimationsList.p_dash_start);
+            else if (isWallSliding) playerController.PlayAnimation(PlayerAnimationsList.p_wall_slide);
+            else if (rb.velocity.y > 0) playerController.PlayAnimation(PlayerAnimationsList.p_jump);
+            else if (rb.velocity.y < 0) playerController.PlayAnimation(PlayerAnimationsList.p_jump_to_fall);
+            else if (rb.velocity.x != 0) playerController.PlayAnimation(PlayerAnimationsList.p_run);
+            else playerController.PlayAnimation(PlayerAnimationsList.p_idle);
         }
 
         public void MovementTranslator(Vector2 movementDirection, bool jumpHolded, bool jumpPressed, bool dashPerfomed, bool wallSliding, bool attacking)
@@ -239,6 +235,11 @@ namespace Player
         public bool GetIsDashing()
         {
             return isDashing;
+        }
+
+        public float GetFacingDirection()
+        {
+            return facingDirection;
         }
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Player
 {
-    public enum AnimationsList
+    public enum PlayerAnimationsList
     {
         p_idle,
         p_run,
@@ -30,7 +30,7 @@ namespace Player
         private PlayerController playerController;
 
         private bool facingRight = true;
-        private AnimationsList currentAnimation;
+        private PlayerAnimationsList currentAnimation;
 
         // Start is called before the first frame update
         private void Awake()
@@ -58,13 +58,13 @@ namespace Player
             facingRight = right;
         }
 
-        public void Play(AnimationsList animation)
+        public void Play(PlayerAnimationsList animation)
         {
             if (currentAnimation.Equals(animation)) return;
 
             //Exceções
-            if (animation == AnimationsList.p_jump_to_fall && currentAnimation == AnimationsList.p_fall) return;
-            if (animation == AnimationsList.p_dash_start && currentAnimation == AnimationsList.p_dash) return;
+            if (animation == PlayerAnimationsList.p_jump_to_fall && currentAnimation == PlayerAnimationsList.p_fall) return;
+            if (animation == PlayerAnimationsList.p_dash_start && currentAnimation == PlayerAnimationsList.p_dash) return;
 
             anim.Play(animation.ToString());
 

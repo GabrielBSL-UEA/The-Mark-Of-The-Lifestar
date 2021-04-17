@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Enemy;
+using Camera;
+using Interactible;
 
 namespace Player
 {
@@ -13,16 +14,22 @@ namespace Player
         [Header("Hit")]
         [SerializeField] private Transform[] hitDetectors;
         [SerializeField] private float hitRange;
-        [SerializeField] private LayerMask enemyLayer;
+        [SerializeField] private LayerMask hitLayer;
+
+        [Header("Camera Queue")]
+        [SerializeField] private float cameraShakeIntensity = 25f;
+        [SerializeField] private float cameraShakeTime = .15f;
 
         [Header("Attack")]
+        [SerializeField] private float attackDamage = 5f;
         [SerializeField] private float attackDelay = .7f;
-        
+        [SerializeField] private float stunForce = 1f;
 
-        private readonly AnimationsList[] attackAnimations =
+
+        private readonly PlayerAnimationsList[] attackAnimations =
         {
-            AnimationsList.p_attack_1,
-            AnimationsList.p_attack_2
+            PlayerAnimationsList.p_attack_1,
+            PlayerAnimationsList.p_attack_2
         };
 
         private float gravityCache = 0;
@@ -59,24 +66,34 @@ namespace Player
                 comboCounter++;
             } 
             else if(canBufferAttack) attackBuffer = attackInput;
-        }
+        }        
+        
+        //-----------------------------------------------------------------
+        //**********              Animation Calls                **********
+        //-----------------------------------------------------------------
 
         public void ActivateAttackBuffer()
         {
             canBufferAttack = true;
         }
 
+        public void OnTransitionStart()
+        {
+            rb.gravityScale = gravityCache;
+        }
+
         public void OnTransitionEnd()
         {
             if (attackBuffer && comboCounter < attackAnimations.Length)
             {
+                rb.gravityScale = 0;
+                rb.velocity = Vector2.zero;
                 playerController.PlayAnimation(attackAnimations[comboCounter]);
                 comboCounter++;
             }
             else
             {
                 rb.gravityScale = gravityCache;
-
                 attackDelayTimer = 0;
                 comboCounter = 0;
                 isAttacking = false;
@@ -88,32 +105,28 @@ namespace Player
         public void DetectHits()
         {
            
-            List<Transform> enemiesList = new List<Transform>();
+            List<Transform> objectsList = new List<Transform>();
 
             for (int i = 0; i < hitDetectors.Length; i++)
             {
-                Collider2D[] enemiesHit = Physics2D.OverlapCircleAll(hitDetectors[i].position, hitRange, enemyLayer);
+                Collider2D[] objectHits = Physics2D.OverlapCircleAll(hitDetectors[i].position, hitRange, hitLayer);
 
-                for (int j = 0; j < enemiesHit.Length; j++)
+                for (int j = 0; j < objectHits.Length; j++)
                 {
-                    if (enemiesList.Contains(enemiesHit[j].transform)) continue;
-                    enemiesList.Add(enemiesHit[j].transform);
+                    if (objectsList.Contains(objectHits[j].transform)) continue;
+                    objectsList.Add(objectHits[j].transform);
                 }
             }
 
-            if (enemiesList.Count > 0) playerController.ResetInputCounters();
-
-            foreach (Transform enemy in enemiesList)
+            if (objectsList.Count > 0)
             {
-                enemy.GetComponent<EnemyHitTest>().RegisterHit();
+                playerController.ResetInputCounters();
+                CinemachineShake.Instance.StartShake(cameraShakeIntensity, cameraShakeTime);
             }
-        }
 
-        private void OnDrawGizmosSelected()
-        {
-            for (int i = 0; i < hitDetectors.Length; i++)
+            foreach (Transform hit in objectsList)
             {
-                Gizmos.DrawWireSphere(hitDetectors[i].position, hitRange);
+                if(hit.GetComponent<HitReciever>() != null) hit.GetComponent<HitReciever>().RecieveHit(attackDamage, stunForce, playerController.GetFacingDirection());
             }
         }
 
@@ -124,6 +137,18 @@ namespace Player
         public bool GetIsAttacking()
         {
             return isAttacking;
+        }
+
+        //----------------------------------------------------------------
+        //*************                Gizmos                *************
+        //----------------------------------------------------------------
+
+        private void OnDrawGizmosSelected()
+        {
+            for (int i = 0; i < hitDetectors.Length; i++)
+            {
+                Gizmos.DrawWireSphere(hitDetectors[i].position, hitRange);
+            }
         }
     }
 }
