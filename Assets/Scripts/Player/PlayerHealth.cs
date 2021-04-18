@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Interactible;
+using Camera;
 
 namespace Player
 {
@@ -13,6 +15,8 @@ namespace Player
         [SerializeField] private float maxHealth;
 
         [Header("Hit")]
+        [SerializeField] private float cameraShakeIntensity = 40f;
+        [SerializeField] private float cameraShakeTime= .2f;
         [SerializeField] private float invunerabilityTime;
         [SerializeField] private float hitStunTime;
         
@@ -54,18 +58,18 @@ namespace Player
         public void RegisterHit(float damage, float stun, Transform agressor)
         {
             if (!isAlive || isInvunerable || playerController.GetDashState()) return;
-
             
+            CinemachineShake.Instance.StartShake(cameraShakeIntensity, cameraShakeTime);
             agressorDirection = agressor.position.x < transform.position.x ? 1 : -1;
             currentHealth -= damage;
 
             if (currentHealth <= 0)
             {
-                playerController.PlayAnimation(PlayerAnimationsList.p_death);
-                rb.velocity = new Vector2(0, rb.velocity.y);
                 playerController.EnablePlayerInputs(false);
-                playerController.SetHitReciever(false);
                 isAlive = false;
+                playerController.SetHitReciever(false);
+                rb.velocity = new Vector2(0, rb.velocity.y);
+                playerController.PlayAnimation(PlayerAnimationsList.p_death);
             }
             else
             {

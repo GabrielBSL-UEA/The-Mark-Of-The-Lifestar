@@ -17,6 +17,7 @@ namespace Player
         private float coyoteTimer = 0;
         private bool isGrounded;
         private bool isWallSliding;
+        private bool canCoyote = true;
 
         private void Awake()
         {
@@ -29,14 +30,15 @@ namespace Player
         {
             isWallSliding = IsWallSliding();
 
+            if (rb.velocity.y >= .1f) canCoyote = false;
+            else if (Mathf.Approximately(rb.velocity.y, 0) && isGrounded) canCoyote = true;
+            
             if (!IsGrounded())
             {
-                if(coyoteTimer >= coyoteTime)isGrounded = false;
-                else
-                {
-                    coyoteTimer += Time.fixedDeltaTime;
-                    isGrounded = true;
-                }
+                if (coyoteTimer >= coyoteTime || !canCoyote) isGrounded = false;
+                else isGrounded = true;
+                
+                coyoteTimer += Time.fixedDeltaTime;
             }
             else
             {

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Interactible;
 
 namespace Enemy
 {
@@ -47,24 +48,28 @@ namespace Enemy
         {
             if (!isAlive) return;
 
-            currentHealth = isStunned ? currentHealth - damage : currentHealth - (damage * damagePenaltyMultiplier);
-            float direction = enemyController.GetFacingRightValue();
+            currentHealth = isStunned ? currentHealth - (damage * damagePenaltyMultiplier) : currentHealth - damage;
+            float stunPenalty = isStunned ? .5f : 1f;
 
-            if ((agressor.position.x < transform.position.x && direction == 1) ||
-                (agressor.position.x > transform.position.x && direction == -1))
+            float direction = enemyController.GetFacingRightValue(); 
+
+            if (!isStunned 
+                && (agressor.position.x < transform.position.x && direction == 1)
+                || (agressor.position.x > transform.position.x && direction == -1))
             {
                 stunValue += stun * 2;
                 enemyController.CheckNearbyPlayer();
             }
+            else stunValue += stun * stunPenalty;
 
-            else stunValue += stun;
+            enemyController.ApplyBlink();
 
             if (currentHealth <= 0)
             {
+                isAlive = false;
+                enemyController.SetHitReciever(false);
                 rb.velocity = new Vector2(0, rb.velocity.y);
                 enemyController.PlayAnimation(EnemyAnimationsList.e_dead);
-                enemyController.SetHitReciever(false);
-                isAlive = false;
             }
             else if (stunValue >= stunHandleLimit)
             {

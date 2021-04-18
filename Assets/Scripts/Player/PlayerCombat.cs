@@ -118,7 +118,6 @@ namespace Player
 
         public void DetectHits()
         {
-           
             List<Transform> objectsList = new List<Transform>();
 
             for (int i = 0; i < hitDetectors.Length; i++)

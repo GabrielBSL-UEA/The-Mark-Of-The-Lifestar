@@ -291,7 +291,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   jumpHoldDuration: 0.15
   minimalJumpTime: 0.1
-  jumpBufferTime: 0.15
+  jumpBufferTime: 0.2
   airJumps: 1
   dashBufferTime: 0.2
   airDashes: 1
@@ -310,7 +310,7 @@ MonoBehaviour:
   groundLayerMask:
     serializedVersion: 2
     m_Bits: 256
-  coyoteTime: 0.05
+  coyoteTime: 0.15
   collisionDetectionOffset: 0.1
 --- !u!114 &2398716572210760277
 MonoBehaviour:
@@ -387,5 +387,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 50
+  cameraShakeIntensity: 40
+  cameraShakeTime: 0.2
   invunerabilityTime: 1.5
   hitStunTime: 0.2

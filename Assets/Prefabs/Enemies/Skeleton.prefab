@@ -28,7 +28,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6946764141605025400}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &580030816
 GameObject:
@@ -58,7 +58,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6946764141605025400}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1690833365
 GameObject:
@@ -85,6 +85,36 @@ Transform:
   m_GameObject: {fileID: 1690833365}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.5, y: -0.14, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 6946764141605025400}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &165006876123994148
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 683564214339746183}
+  m_Layer: 10
+  m_Name: FeetPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &683564214339746183
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 165006876123994148}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.25, y: -1.43, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6946764141605025400}
@@ -129,6 +159,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 6053805992144933237}
+  - {fileID: 683564214339746183}
   - {fileID: 1690833366}
   - {fileID: 357666210}
   - {fileID: 580030817}
@@ -288,7 +319,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6185b2ef9bb43344db5ab3e3b2570615, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blinkDuration: 0.15
+  blinkDuration: 0.2
 --- !u!114 &3239608347924333277
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -335,6 +366,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyEyesPosition: {fileID: 6053805992144933237}
+  enemyFeetPosition: {fileID: 683564214339746183}
   awarenessRayDistance: 20
   playerTag: Player
   frontRayDistance: 20

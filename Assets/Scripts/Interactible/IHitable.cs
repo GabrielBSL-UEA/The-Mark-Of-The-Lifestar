@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IHitable
+namespace Interactible
 {
-    void RegisterHit(float damage, float stun, Transform agressor);
-    bool GetIsAlive();
+    public interface IHitable
+    {
+        void RegisterHit(float damage, float stun, Transform agressor);
+        bool GetIsAlive();
+    }
 }

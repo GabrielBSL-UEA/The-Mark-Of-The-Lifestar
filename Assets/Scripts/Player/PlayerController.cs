@@ -77,6 +77,11 @@ namespace Player
             playerAnimations.StartBlink(value);
         }
 
+        public void ForcePlayerFlip()
+        {
+            playerAnimations.ForceFlip();
+        }
+
         public void SetHitReciever(bool value)
         {
             GetComponent<HitReciever>().SetCanRecieveHit(value);

@@ -27,7 +27,7 @@ namespace Enemy
             enemyController = GetComponent<EnemyController>();
         }
 
-        public void DetectionsInterpreter(bool playerDetected, bool obstacleDetected, bool inAttackRange, Vector2 playerPosition, bool inAttackState)
+        public void DetectionsInterpreter(bool playerDetected, bool obstacleDetected, bool inAttackRange, Transform playerPosition, bool inAttackState)
         {
             if (inAttackState) return;
 
@@ -46,19 +46,21 @@ namespace Enemy
             }
         }
 
-        private void ReachPlayer(Vector2 playerPosition, bool obstacleDetected, bool inAttackRange)
+        private void ReachPlayer(Transform playerPosition, bool obstacleDetected, bool inAttackRange)
         {
             patrolTimer = patrolTime;
-            
-            if (Mathf.Abs(playerPosition.x - transform.position.x) < enemyController.GetAttackRange())
+
+            float playerBoxExtends = playerPosition.GetComponent<BoxCollider2D>().bounds.extents.x;
+
+            if (Mathf.Abs(playerPosition.position.x - transform.position.x) - playerBoxExtends < enemyController.GetAttackRange())
             {
                 if (inAttackRange) enemyController.AttackPlayer();
                 else
                 {
                     enemyController.PlayAnimation(EnemyAnimationsList.e_idle);
 
-                    if (playerPosition.x > transform.position.x && facingRight == -1) StartFlip();
-                    else if (playerPosition.x < transform.position.x && facingRight == 1) StartFlip();
+                    if (playerPosition.position.x > transform.position.x && facingRight == -1) StartFlip();
+                    else if (playerPosition.position.x < transform.position.x && facingRight == 1) StartFlip();
                 }
 
                 rb.velocity = new Vector2(0, rb.velocity.y);
@@ -66,20 +68,29 @@ namespace Enemy
 
             else
             {
-                if (obstacleDetected) enemyController.PlayAnimation(EnemyAnimationsList.e_idle);
-                else enemyController.PlayAnimation(EnemyAnimationsList.e_walk);
+                float obstacleMultiplier;
 
-                if (playerPosition.x > transform.position.x)
+                if (obstacleDetected)
+                {
+                    enemyController.PlayAnimation(EnemyAnimationsList.e_idle);
+                    obstacleMultiplier = 0;
+                }
+                else
+                {
+                    enemyController.PlayAnimation(EnemyAnimationsList.e_walk);
+                    obstacleMultiplier = 1;
+                }
+                if (playerPosition.position.x > transform.position.x)
                 {
                     if (facingRight == -1) StartFlip();
 
-                    rb.velocity = new Vector2(velocity, rb.velocity.y);
+                    rb.velocity = new Vector2(velocity * obstacleMultiplier, rb.velocity.y);
                 }
-                else if (playerPosition.x < transform.position.x)
+                else if (playerPosition.position.x < transform.position.x)
                 {
                     if (facingRight == 1) StartFlip();
 
-                    rb.velocity = new Vector2(-velocity, rb.velocity.y);
+                    rb.velocity = new Vector2(-velocity * obstacleMultiplier, rb.velocity.y);
                 }
             }
         }

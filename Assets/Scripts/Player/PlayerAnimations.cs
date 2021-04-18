@@ -67,7 +67,7 @@ namespace Player
             }
         }
 
-        private void Flip(bool right)
+        public void Flip(bool right)
         {
             if (facingRight == right) return;
 
@@ -77,6 +77,11 @@ namespace Player
             facingRight = right;
         }
 
+        public void ForceFlip()
+        {
+            Flip(!facingRight);
+        }
+
         public void Play(PlayerAnimationsList animation)
         {
             if (currentAnimation.Equals(animation)) return;
@@ -84,6 +89,8 @@ namespace Player
             //Exceções
             if (animation == PlayerAnimationsList.p_jump_to_fall && currentAnimation == PlayerAnimationsList.p_fall) return;
             if (animation == PlayerAnimationsList.p_dash_start && currentAnimation == PlayerAnimationsList.p_dash) return;
+            if (animation == PlayerAnimationsList.p_jump_to_fall && currentAnimation != PlayerAnimationsList.p_jump) animation = PlayerAnimationsList.p_fall;
+            //Exceções
 
             anim.Play(animation.ToString());
 

@@ -17,10 +17,11 @@ namespace Enemy
 
         private attackType attack;
         private float range;
-        private Vector2 playerPosition;
+        private Transform playerPosition;
 
         [Header("Player Detection")]
         [SerializeField] private Transform enemyEyesPosition;
+        [SerializeField] private Transform enemyFeetPosition;
         [SerializeField] private float awarenessRayDistance = 20f;
         [SerializeField] private string playerTag = "Player";
 
@@ -77,7 +78,7 @@ namespace Enemy
             {
                 if (rayHitFront[i].transform.CompareTag(playerTag) && CanRecieveHits(rayHitFront[i].transform))
                 {
-                    playerPosition = rayHitFront[i].transform.position;
+                    playerPosition = rayHitFront[i].transform;
                     return true;
                 }
             }
@@ -86,7 +87,7 @@ namespace Enemy
             {
                 if (rayHitBack[i].transform.CompareTag(playerTag) && CanRecieveHits(rayHitBack[i].transform))
                 {
-                    playerPosition = rayHitBack[i].transform.position;
+                    playerPosition = rayHitBack[i].transform;
                     return true;
                 }
             }
@@ -102,7 +103,7 @@ namespace Enemy
             {
                 if (rayHit[i].transform.CompareTag(playerTag) && CanRecieveHits(rayHit[i].transform))
                 {
-                    playerPosition = rayHit[i].transform.position;
+                    playerPosition = rayHit[i].transform;
                     return true;
                 }
             }
@@ -111,17 +112,41 @@ namespace Enemy
 
         private bool CheckInAttackRange(float rayRange)
         {
-            RaycastHit2D[] rayHit;
-
             if (attack == attackType.melee)
-                rayHit = Physics2D.RaycastAll(enemyEyesPosition.position, Vector2.right * FacingRight(), rayRange);
+            {
+                RaycastHit2D[] rayHitEyes;
+                RaycastHit2D[] rayHitFeet;
 
+                rayHitEyes = Physics2D.RaycastAll(enemyEyesPosition.position, Vector2.right * FacingRight(), rayRange);
+                rayHitFeet = Physics2D.RaycastAll(enemyFeetPosition.position, Vector2.right * FacingRight(), rayRange);
+
+                for (int i = 0; i < rayHitEyes.Length; i++)
+                {
+                    if (rayHitEyes[i].transform.CompareTag(playerTag) && CanRecieveHits(rayHitEyes[i].transform))
+                    {
+                        playerPosition = rayHitEyes[i].transform;
+                        return true;
+                    }
+                }
+
+                for (int i = 0; i < rayHitFeet.Length; i++)
+                {
+                    if (rayHitFeet[i].transform.CompareTag(playerTag) && CanRecieveHits(rayHitFeet[i].transform))
+                    {
+                        playerPosition = rayHitFeet[i].transform;
+                        return true;
+                    }
+                }
+            }
             else
+            {
+                RaycastHit2D[] rayHit;
                 rayHit = Physics2D.CircleCastAll(enemyEyesPosition.position, rayRange, Vector2.zero);
 
-            for (int i = 0; i < rayHit.Length; i++)
-            {
-                if (rayHit[i].transform.CompareTag(playerTag) && CanRecieveHits(rayHit[i].transform)) return true;
+                for (int i = 0; i < rayHit.Length; i++)
+                {
+                    if (rayHit[i].transform.CompareTag(playerTag) && CanRecieveHits(rayHit[i].transform)) return true;
+                }
             }
             return false;
         }
@@ -173,6 +198,7 @@ namespace Enemy
                 Gizmos.DrawWireSphere(enemyEyesPosition.position, awarenessRayDistance);
                 Gizmos.color = Color.red;
                 Gizmos.DrawLine(enemyEyesPosition.position, new Vector3((enemyEyesPosition.position.x + range * FacingRight()), enemyEyesPosition.position.y, enemyEyesPosition.position.z));
+                Gizmos.DrawLine(enemyFeetPosition.position, new Vector3((enemyFeetPosition.position.x + range * FacingRight()), enemyFeetPosition.position.y, enemyFeetPosition.position.z));
             }
             else
             {
@@ -199,7 +225,7 @@ namespace Enemy
             return inAttackRangeDetector;
         }
 
-        public Vector2 GetPlayerPosition()
+        public Transform GetPlayerPosition()
         {
             return playerPosition;
         }

@@ -61,25 +61,10 @@ namespace Player
             playerController = GetComponent<PlayerController>();
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
-            if (dashDelayTimer > 0) dashDelayTimer -= Time.deltaTime;
-            if (isDashing) dashTimer += Time.deltaTime;
-
-            AnimationCall();
-        }
-
-        private void AnimationCall()
-        {
-            if (isStunned) playerController.PlayAnimation(PlayerAnimationsList.p_hurt);
-            else if (isAttacking) return;
-
-            else if (isDashing) playerController.PlayAnimation(PlayerAnimationsList.p_dash_start);
-            else if (isWallSliding) playerController.PlayAnimation(PlayerAnimationsList.p_wall_slide);
-            else if (rb.velocity.y > 0) playerController.PlayAnimation(PlayerAnimationsList.p_jump);
-            else if (rb.velocity.y < 0) playerController.PlayAnimation(PlayerAnimationsList.p_jump_to_fall);
-            else if (rb.velocity.x != 0) playerController.PlayAnimation(PlayerAnimationsList.p_run);
-            else playerController.PlayAnimation(PlayerAnimationsList.p_idle);
+            if (dashDelayTimer > 0) dashDelayTimer -= Time.fixedDeltaTime;
+            if (isDashing) dashTimer += Time.fixedDeltaTime;
         }
 
         public void MovementTranslator(Vector2 movementDirection, bool jumpHolded, bool jumpPressed, bool dashPerfomed, bool wallSliding, bool attacking, bool stunned)
@@ -106,6 +91,22 @@ namespace Player
                 Jump(jumpHolded, jumpPressed);
                 Move(movementDirection);
             }
+
+            AnimationCall();
+        }
+
+        private void AnimationCall()
+        {
+            if (isStunned) playerController.PlayAnimation(PlayerAnimationsList.p_hurt);
+            else if (!isAttacking)
+            {
+                if (isDashing) playerController.PlayAnimation(PlayerAnimationsList.p_dash_start);
+                else if (isWallSliding) playerController.PlayAnimation(PlayerAnimationsList.p_wall_slide);
+                else if (rb.velocity.y > .1f) playerController.PlayAnimation(PlayerAnimationsList.p_jump);
+                else if (rb.velocity.y < -.1f) playerController.PlayAnimation(PlayerAnimationsList.p_jump_to_fall);
+                else if (rb.velocity.x != 0) playerController.PlayAnimation(PlayerAnimationsList.p_run);
+                else playerController.PlayAnimation(PlayerAnimationsList.p_idle);
+            }
         }
 
         private void HitImpulse()
@@ -118,7 +119,7 @@ namespace Player
         {
             isWallSliding = false;
 
-            if (rb.velocity.y < (fallVelocityLimit * -1)) rb.velocity = new Vector2(rb.velocity.x, -fallVelocityLimit);
+            if (rb.velocity.y < (-fallVelocityLimit)) rb.velocity = new Vector2(rb.velocity.x, -fallVelocityLimit);
         }
 
         private void WallSlideControl(bool jumpPressed, float direction)
@@ -127,9 +128,7 @@ namespace Player
 
             if (jumpPressed && !isWallJumping && antiWallJumpOnFirstContactWhilePressingJump)
             {
-                playerController.ResetInputCounters();
                 wallJumpXImpulseTimer = 0;
-                isWallJumping = true;
 
                 if (direction > 0) wallJumpDirection = 1;
                 else wallJumpDirection = -1;
@@ -139,6 +138,7 @@ namespace Player
                 if (!jumpPressed) isWallJumping = false;
             }
 
+            playerController.ResetInputCounters();
             rb.velocity = new Vector2(rb.velocity.x, -wallSlideSpeed);
         }
 
@@ -151,6 +151,8 @@ namespace Player
                 playerController.EnablePlayerInputs(false);
                 dashDirecton = playerController.GetDashDirection();
                 reverseDash = wallSliding;
+
+                if (reverseDash) playerController.ForcePlayerFlip();
             }
             
             if (dashTimer > dashDuration)
