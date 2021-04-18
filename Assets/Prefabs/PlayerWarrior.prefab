@@ -334,6 +334,8 @@ MonoBehaviour:
   wallSlideSpeed: 6
   wallJumpXForce: 18
   wallJumpXImpulseTime: 0.13
+  hitImpulseX: 30
+  hitImpulseY: 15
 --- !u!114 &2398716572210760276
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -346,6 +348,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa55b21afd22e9c419ccb7eb59b56d90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blinkFrequency: 0.05
 --- !u!114 &2398716572210760279
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -384,6 +387,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 50
-  stunTime: 2
-  stunHandleLimit: 10
-  stunValueDecreaseOverSecond: 2
+  invunerabilityTime: 1.5
+  hitStunTime: 0.2

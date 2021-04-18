@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Interactible;
 
 namespace Enemy
 {
@@ -74,7 +75,7 @@ namespace Enemy
 
             for (int i = 0; i < rayHitFront.Length; i++)
             {
-                if (rayHitFront[i].transform.CompareTag(playerTag))
+                if (rayHitFront[i].transform.CompareTag(playerTag) && CanRecieveHits(rayHitFront[i].transform))
                 {
                     playerPosition = rayHitFront[i].transform.position;
                     return true;
@@ -83,7 +84,7 @@ namespace Enemy
 
             for (int i = 0; i < rayHitBack.Length; i++)
             {
-                if (rayHitBack[i].transform.CompareTag(playerTag))
+                if (rayHitBack[i].transform.CompareTag(playerTag) && CanRecieveHits(rayHitBack[i].transform))
                 {
                     playerPosition = rayHitBack[i].transform.position;
                     return true;
@@ -99,7 +100,7 @@ namespace Enemy
 
             for (int i = 0; i < rayHit.Length; i++)
             {
-                if (rayHit[i].transform.CompareTag(playerTag))
+                if (rayHit[i].transform.CompareTag(playerTag) && CanRecieveHits(rayHit[i].transform))
                 {
                     playerPosition = rayHit[i].transform.position;
                     return true;
@@ -120,7 +121,7 @@ namespace Enemy
 
             for (int i = 0; i < rayHit.Length; i++)
             {
-                if (rayHit[i].transform.CompareTag(playerTag)) return true;
+                if (rayHit[i].transform.CompareTag(playerTag) && CanRecieveHits(rayHit[i].transform)) return true;
             }
             return false;
         }
@@ -147,6 +148,16 @@ namespace Enemy
             return false;
         }
 
+        public void ForceCheckNearPlayer()
+        {
+            if (CheckNearPlayer(playerDetectionRayDistance)) playerDetected = true;
+        }
+
+        private bool CanRecieveHits(Transform player)
+        {
+            return player.GetComponent<HitReciever>().GetCanRecieveHit();
+        }
+
         private float FacingRight()
         {
             return enemyController.GetFacingRightValue();
@@ -169,7 +180,6 @@ namespace Enemy
                 Gizmos.DrawLine(enemyEyesPosition.position, new Vector3((enemyEyesPosition.position.x - backRayDistance * FacingRight()), enemyEyesPosition.position.y, enemyEyesPosition.position.z));
             }
         }
-
         //-----------------------------------------------------------------
         //**********                Get Functions                **********
         //-----------------------------------------------------------------

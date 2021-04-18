@@ -6,9 +6,25 @@ namespace Interactible
 {
     public class HitReciever : MonoBehaviour
     {
-        public void RecieveHit(float damage, float stun, float direction)
+        private bool canRecieveHit = true;
+
+        public void RecieveHit(float damage, float stun, Transform agressor)
         {
-            if (GetComponent<IHitable>() != null) GetComponent<IHitable>().RegisterHit(damage, stun, direction);
+            if (GetComponent<IHitable>() != null) GetComponent<IHitable>().RegisterHit(damage, stun, agressor);
+        }
+
+        //-----------------------------------------------------------------
+        //**********                Get Functions                **********
+        //-----------------------------------------------------------------
+
+        public bool GetCanRecieveHit()
+        {
+            return canRecieveHit;
+        }
+
+        public void SetCanRecieveHit(bool value)
+        {
+            canRecieveHit = value;
         }
     }
 }

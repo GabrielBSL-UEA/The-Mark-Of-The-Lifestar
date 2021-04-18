@@ -28,6 +28,7 @@ namespace Player
         private bool reverseDash = false;
 
         private bool isDashing = false;
+        private bool isStunned = false;
         private bool isAttacking = false;
         private bool isWallSliding = false;
         private bool isWallJumping = false;
@@ -50,6 +51,10 @@ namespace Player
         [SerializeField] private float wallJumpXForce;
         [SerializeField] private float wallJumpXImpulseTime;
 
+        [Header("Hit")]
+        [SerializeField] private float hitImpulseX;
+        [SerializeField] private float hitImpulseY;
+
         private void Awake()
         {
             rb = GetComponent<Rigidbody2D>();
@@ -61,12 +66,15 @@ namespace Player
             if (dashDelayTimer > 0) dashDelayTimer -= Time.deltaTime;
             if (isDashing) dashTimer += Time.deltaTime;
 
-            if (!isAttacking) AnimationCall();
+            AnimationCall();
         }
 
         private void AnimationCall()
         {
-            if (isDashing) playerController.PlayAnimation(PlayerAnimationsList.p_dash_start);
+            if (isStunned) playerController.PlayAnimation(PlayerAnimationsList.p_hurt);
+            else if (isAttacking) return;
+
+            else if (isDashing) playerController.PlayAnimation(PlayerAnimationsList.p_dash_start);
             else if (isWallSliding) playerController.PlayAnimation(PlayerAnimationsList.p_wall_slide);
             else if (rb.velocity.y > 0) playerController.PlayAnimation(PlayerAnimationsList.p_jump);
             else if (rb.velocity.y < 0) playerController.PlayAnimation(PlayerAnimationsList.p_jump_to_fall);
@@ -74,8 +82,15 @@ namespace Player
             else playerController.PlayAnimation(PlayerAnimationsList.p_idle);
         }
 
-        public void MovementTranslator(Vector2 movementDirection, bool jumpHolded, bool jumpPressed, bool dashPerfomed, bool wallSliding, bool attacking)
+        public void MovementTranslator(Vector2 movementDirection, bool jumpHolded, bool jumpPressed, bool dashPerfomed, bool wallSliding, bool attacking, bool stunned)
         {
+            isStunned = stunned;
+            if (isStunned)
+            {
+                HitImpulse();
+                return;
+            }
+
             isAttacking = attacking;
             if (isAttacking) return;
 
@@ -91,6 +106,12 @@ namespace Player
                 Jump(jumpHolded, jumpPressed);
                 Move(movementDirection);
             }
+        }
+
+        private void HitImpulse()
+        {
+            rb.velocity = new Vector2(hitImpulseX * playerController.GetLastAgressorDirection(), hitImpulseY);
+            playerController.ResetInputCounters();
         }
 
         private void FallControl()

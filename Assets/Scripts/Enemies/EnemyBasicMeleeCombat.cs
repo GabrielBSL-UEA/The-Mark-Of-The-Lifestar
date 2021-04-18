@@ -56,8 +56,11 @@ namespace Enemy
             
             startAttackTimer += Time.fixedDeltaTime;
 
-            if (startAttackTimer < startAttackTime) return;
-
+            if (startAttackTimer < startAttackTime)
+            {
+                enemyController.PlayAnimation(EnemyAnimationsList.e_idle);
+                return;
+            }
             inAttackState = true;
             enemyController.PlayAnimation(EnemyAnimationsList.e_attack);
         }
@@ -81,7 +84,7 @@ namespace Enemy
 
             if (player == null) return;
 
-            player.GetComponent<HitReciever>().RecieveHit(attackDamage, stunForce, enemyController.GetFacingRightValue());
+            player.GetComponent<HitReciever>().RecieveHit(attackDamage, stunForce, transform);
         }
 
         public void OnAttackEnds()
@@ -100,6 +103,7 @@ namespace Enemy
             inAttackState = false;
             afterAttackLock = false;
             inBetweenAttacksTimer = 0;
+            startAttackTimer = 0;
         }
 
         //-----------------------------------------------------------------

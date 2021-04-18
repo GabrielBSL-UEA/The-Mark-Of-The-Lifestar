@@ -288,6 +288,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6185b2ef9bb43344db5ab3e3b2570615, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blinkDuration: 0.15
 --- !u!114 &3239608347924333277
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -303,7 +304,7 @@ MonoBehaviour:
   maxHealth: 30
   stunTime: 1
   stunHandleLimit: 10
-  stunValue: 0
+  damagePenaltyMultiplier: 1.5
   stunValueDecreaseOverSecond: 1
 --- !u!114 &2806429995486732495
 MonoBehaviour:
@@ -361,8 +362,8 @@ MonoBehaviour:
   attackRange: 2.5
   attackDamage: 5
   stunForce: 2
-  startAttackTime: 0
-  inBetweenAttacksTime: 1.5
+  startAttackTime: 0.5
+  inBetweenAttacksTime: 0.5
   hitDetectors:
   - {fileID: 1690833366}
   - {fileID: 357666210}

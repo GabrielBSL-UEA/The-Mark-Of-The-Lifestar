@@ -15,13 +15,26 @@ namespace Enemy
 
     public class EnemyAnimation : MonoBehaviour
     {
-        private EnemyAnimationsList currentAnimation;
+        [SerializeField] private float blinkDuration;
 
+        private float blinkDurationTimer = 0;
+
+        private EnemyAnimationsList currentAnimation;
+        private SpriteRenderer spriteRenderer;
         private Animator anim;
 
         private void Awake()
         {
             anim = GetComponent<Animator>();
+            spriteRenderer = GetComponent<SpriteRenderer>();
+        }
+
+        private void Update()
+        {
+            if (blinkDurationTimer <= 0) return;
+
+            blinkDurationTimer -= Time.deltaTime;
+            spriteRenderer.color = new Color(1, (blinkDuration - blinkDurationTimer) / blinkDuration, (blinkDuration - blinkDurationTimer) / blinkDuration);
         }
 
         public void Flip()
@@ -37,6 +50,11 @@ namespace Enemy
 
             anim.Play(animation.ToString());
             currentAnimation = animation;
+        }
+
+        public void Blink()
+        {
+            blinkDurationTimer = blinkDuration;
         }
     }
 }

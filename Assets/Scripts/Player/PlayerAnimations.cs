@@ -25,17 +25,25 @@ namespace Player
 
     public class PlayerAnimations : MonoBehaviour
     {
+        [SerializeField] private float blinkFrequency = .05f;
+
+        private float blinkFrequencyTimer = 0;
+
         private Rigidbody2D rb;
         private Animator anim;
+        private SpriteRenderer spriteRenderer;
         private PlayerController playerController;
 
         private bool facingRight = true;
+        private bool blinking = false;
+
         private PlayerAnimationsList currentAnimation;
 
         // Start is called before the first frame update
         private void Awake()
         {
             playerController = GetComponent<PlayerController>();
+            spriteRenderer = GetComponent<SpriteRenderer>();
             rb = GetComponent<Rigidbody2D>();
             anim = GetComponent<Animator>();
         }
@@ -46,6 +54,17 @@ namespace Player
             float direction = playerController.GetMovementInputs().x;
 
             if (Mathf.Abs(direction) > playerController.GetDeadZone() && !playerController.GetPlayerIsAttacking()) Flip(direction > 0);
+
+            if (blinking)
+            {
+                blinkFrequencyTimer += Time.deltaTime;
+
+                if(blinkFrequencyTimer > blinkFrequency)
+                {
+                    spriteRenderer.enabled = !spriteRenderer.enabled;
+                    blinkFrequencyTimer = 0;
+                }
+            }
         }
 
         private void Flip(bool right)
@@ -69,6 +88,13 @@ namespace Player
             anim.Play(animation.ToString());
 
             currentAnimation = animation;
+        }
+
+        public void StartBlink(bool value)
+        {
+            blinking = value;
+
+            if (!value) spriteRenderer.enabled = true;
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Camera;
 using Interactible;
+using System;
 
 namespace Player
 {
@@ -52,11 +53,13 @@ namespace Player
             if(attackDelayTimer < attackDelay) attackDelayTimer += Time.deltaTime;
         }
 
-        public void RecieveAttackInput(bool attackInput, bool dashing)
+        public void AttackInterpreter(bool attackInput, bool dashing, bool stunned)
         {
-            if (attackDelayTimer < attackDelay || !attackInput) return;
+            if (stunned) ResetAttack();
 
-            if (!isAttacking)
+            else if (attackDelayTimer < attackDelay || !attackInput) return;
+
+            else if (!isAttacking)
             {
                 rb.gravityScale = 0;
                 rb.velocity = Vector2.zero;
@@ -66,8 +69,19 @@ namespace Player
                 comboCounter++;
             } 
             else if(canBufferAttack) attackBuffer = attackInput;
-        }        
-        
+        }
+
+        private void ResetAttack()
+        {
+            rb.gravityScale = gravityCache;
+            attackDelayTimer = 0;
+            comboCounter = 0;
+
+            isAttacking = false;
+            attackBuffer = false;
+            canBufferAttack = false;
+        }
+
         //-----------------------------------------------------------------
         //**********              Animation Calls                **********
         //-----------------------------------------------------------------
@@ -118,15 +132,21 @@ namespace Player
                 }
             }
 
-            if (objectsList.Count > 0)
-            {
-                playerController.ResetInputCounters();
-                CinemachineShake.Instance.StartShake(cameraShakeIntensity, cameraShakeTime);
-            }
+            int totalObjects = 0;
 
             foreach (Transform hit in objectsList)
             {
-                if(hit.GetComponent<HitReciever>() != null) hit.GetComponent<HitReciever>().RecieveHit(attackDamage, stunForce, playerController.GetFacingDirection());
+                if (hit.GetComponent<HitReciever>() != null && hit.GetComponent<HitReciever>().GetCanRecieveHit())
+                {
+                    hit.GetComponent<HitReciever>().RecieveHit(attackDamage, stunForce, transform);
+                    totalObjects++;
+                }
+            }
+
+            if(totalObjects > 0)
+            {
+                playerController.ResetInputCounters();
+                CinemachineShake.Instance.StartShake(cameraShakeIntensity, cameraShakeTime);
             }
         }
 

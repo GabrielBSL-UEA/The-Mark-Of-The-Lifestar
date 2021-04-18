@@ -48,9 +48,24 @@ namespace Enemy
             enemyCombat.Attack();
         }
 
+        public void CheckNearbyPlayer()
+        {
+            enemySense.ForceCheckNearPlayer();
+        }
+
         public void PlayAnimation(EnemyAnimationsList animation)
         {
             enemyAnimation.Play(animation);
+        }
+
+        public void ApplyBlink()
+        {
+            enemyAnimation.Blink();
+        }
+
+        public void SetHitReciever(bool value)
+        {
+            GetComponent<HitReciever>().SetCanRecieveHit(value);
         }
 
         //-----------------------------------------------------------------

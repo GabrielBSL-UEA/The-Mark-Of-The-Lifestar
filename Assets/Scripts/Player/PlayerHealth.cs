@@ -12,17 +12,18 @@ namespace Player
         [Header("Health")]
         [SerializeField] private float maxHealth;
 
-        [Header("Stun")]
-        [SerializeField] private float stunTime;
-        [SerializeField] private float stunHandleLimit;
-        [SerializeField] private float stunValueDecreaseOverSecond;
-
-        private float stunValue = 0;
-        private float stunTimer = 0;
-
+        [Header("Hit")]
+        [SerializeField] private float invunerabilityTime;
+        [SerializeField] private float hitStunTime;
+        
+        private float invunerabilityTimer = 0;
+        private float hitStunTimer = 0;
         private float currentHealth;
+        private float agressorDirection;
+
         private bool isAlive = true;
         private bool isStunned = false;
+        private bool isInvunerable = false;
 
         private void Awake()
         {
@@ -35,37 +36,44 @@ namespace Player
         {
             if (isStunned)
             {
-                if (stunTimer < 0) isStunned = false;
-                else stunTimer -= Time.deltaTime;
+                if (hitStunTimer < 0) isStunned = false;
+                else hitStunTimer -= Time.deltaTime;
             }
 
-            if (stunValue > 0) stunValue -= stunValueDecreaseOverSecond * Time.deltaTime;
+            if (isInvunerable)
+            {
+                if (invunerabilityTimer < 0)
+                {
+                    isInvunerable = false;
+                    playerController.MakePlayerBlink(false);
+                }
+                else invunerabilityTimer -= Time.deltaTime;
+            }
         }
 
-        public void RegisterHit(float damage, float stun, float direction)
+        public void RegisterHit(float damage, float stun, Transform agressor)
         {
-            if (!isAlive) return;
+            if (!isAlive || isInvunerable || playerController.GetDashState()) return;
 
-            isStunned = false;
-            stunTimer = 0;
-
+            
+            agressorDirection = agressor.position.x < transform.position.x ? 1 : -1;
             currentHealth -= damage;
-            stunValue = playerController.GetFacingDirection() == direction ? stunValue + stun * 2 : stunValue + stun;
 
             if (currentHealth <= 0)
             {
-                rb.velocity = new Vector2(0, rb.velocity.y);
                 playerController.PlayAnimation(PlayerAnimationsList.p_death);
+                rb.velocity = new Vector2(0, rb.velocity.y);
                 playerController.EnablePlayerInputs(false);
+                playerController.SetHitReciever(false);
                 isAlive = false;
             }
-            else if (stunValue >= stunHandleLimit)
+            else
             {
-                rb.velocity = new Vector2(0, rb.velocity.y);
-                playerController.PlayAnimation(PlayerAnimationsList.p_hurt);
+                invunerabilityTimer = invunerabilityTime;
+                playerController.MakePlayerBlink(true);
+                hitStunTimer = hitStunTime;
+                isInvunerable = true;
                 isStunned = true;
-                stunValue = 0;
-                stunTimer = stunTime;
             }
         }
 
@@ -76,6 +84,16 @@ namespace Player
         public bool GetIsAlive()
         {
             return isAlive;
+        }
+
+        public bool GetIsStunned()
+        {
+            return isStunned;
+        }
+
+        public float GetAgressorDirection()
+        {
+            return agressorDirection;
         }
     }
 }

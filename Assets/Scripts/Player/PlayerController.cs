@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Interactible;
 
 namespace Player
 {
@@ -31,9 +32,10 @@ namespace Player
 
             if (playerCombat.enabled)
             {
-                playerCombat.RecieveAttackInput(
+                playerCombat.AttackInterpreter(
                     playerInputs.GetHasPressedAttack(),
-                    playerMovement.GetIsDashing());
+                    playerMovement.GetIsDashing(),
+                    playerHealth.GetIsStunned());
             }
 
             if (playerMovement.enabled)
@@ -44,7 +46,8 @@ namespace Player
                     playerInputs.GetHasJumped(),
                     playerInputs.GetDashPerfomed(),
                     playerCollision.GetIsWallSliding(),
-                    playerCombat.GetIsAttacking());
+                    playerCombat.GetIsAttacking(),
+                    playerHealth.GetIsStunned());
             }
         }
 
@@ -67,6 +70,16 @@ namespace Player
         {
             if (playerMovement.enabled == value) return;
             playerMovement.enabled = value;
+        }
+
+        public void MakePlayerBlink(bool value)
+        {
+            playerAnimations.StartBlink(value);
+        }
+
+        public void SetHitReciever(bool value)
+        {
+            GetComponent<HitReciever>().SetCanRecieveHit(value);
         }
 
         //-----------------------------------------------------------------
@@ -107,6 +120,11 @@ namespace Player
             return playerInputs.GetDashDirectionCache();
         }
 
+        public float GetLastAgressorDirection()
+        {
+            return playerHealth.GetAgressorDirection();
+        }
+
         public float GetFacingDirection()
         {
             return playerMovement.GetFacingDirection();
@@ -115,6 +133,11 @@ namespace Player
         public float GetDashDelayTimer()
         {
             return playerMovement.GetDashDelayRemaining();
+        }
+
+        public bool GetDashState()
+        {
+            return playerMovement.GetIsDashing();
         }
 
         public bool GetPlayerIsAttacking()

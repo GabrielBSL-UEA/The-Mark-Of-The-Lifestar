@@ -4,6 +4,6 @@ using UnityEngine;
 
 public interface IHitable
 {
-    void RegisterHit(float damage, float stun, float direction);
+    void RegisterHit(float damage, float stun, Transform agressor);
     bool GetIsAlive();
 }

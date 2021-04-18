@@ -15,9 +15,10 @@ namespace Enemy
         [Header("Stun")]
         [SerializeField] private float stunTime;
         [SerializeField] private float stunHandleLimit;
-        [SerializeField] private float stunValue = 0;
+        [SerializeField] private float damagePenaltyMultiplier;
         [SerializeField] private float stunValueDecreaseOverSecond;
 
+        private float stunValue = 0;
         private float stunTimer = 0;
 
         private float currentHealth;
@@ -35,25 +36,34 @@ namespace Enemy
         {
             if (isStunned)
             {
-                if(stunTimer < 0) isStunned = false;
+                if (stunTimer < 0) isStunned = false;
                 else stunTimer -= Time.deltaTime;
             }
 
             else if (stunValue > 0) stunValue -= stunValueDecreaseOverSecond * Time.deltaTime;
         }
 
-        public void RegisterHit(float damage, float stun, float direction)
+        public void RegisterHit(float damage, float stun, Transform agressor)
         {
             if (!isAlive) return;
 
-            currentHealth -= damage;
+            currentHealth = isStunned ? currentHealth - damage : currentHealth - (damage * damagePenaltyMultiplier);
+            float direction = enemyController.GetFacingRightValue();
 
-            if(!isStunned) stunValue = enemyController.GetFacingRightValue() == direction ? stunValue + stun * 2 : stunValue + stun;
+            if ((agressor.position.x < transform.position.x && direction == 1) ||
+                (agressor.position.x > transform.position.x && direction == -1))
+            {
+                stunValue += stun * 2;
+                enemyController.CheckNearbyPlayer();
+            }
+
+            else stunValue += stun;
 
             if (currentHealth <= 0)
             {
                 rb.velocity = new Vector2(0, rb.velocity.y);
                 enemyController.PlayAnimation(EnemyAnimationsList.e_dead);
+                enemyController.SetHitReciever(false);
                 isAlive = false;
             }
             else if (stunValue >= stunHandleLimit)
