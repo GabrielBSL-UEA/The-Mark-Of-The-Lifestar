@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Interactible;
+using Camera;
 
 namespace Enemy
 {
@@ -13,10 +14,15 @@ namespace Enemy
         [Header("Health")]
         [SerializeField] private float maxHealth;
 
+        [Header("Camera Queue")]
+        [SerializeField] private float cameraShakeIntensity = 25f;
+        [SerializeField] private float cameraShakeTime = .15f;
+
         [Header("Stun")]
         [SerializeField] private float stunTime;
         [SerializeField] private float stunHandleLimit;
-        [SerializeField] private float damagePenaltyMultiplier;
+        [SerializeField] private float critStunPenaltyMultiplier;
+        [SerializeField] private float damageStunPenaltyMultiplier;
         [SerializeField] private float stunValueDecreaseOverSecond;
 
         private float stunValue = 0;
@@ -48,33 +54,37 @@ namespace Enemy
         {
             if (!isAlive) return;
 
-            currentHealth = isStunned ? currentHealth - (damage * damagePenaltyMultiplier) : currentHealth - damage;
+            currentHealth = isStunned ? currentHealth - (damage * damageStunPenaltyMultiplier) : currentHealth - damage;
             float stunPenalty = isStunned ? .5f : 1f;
 
-            float direction = enemyController.GetFacingRightValue(); 
+            float direction = enemyController.GetFacingRightValue();
+            bool fromBehind = false;
 
-            if (!isStunned 
+            if (!isStunned
                 && (agressor.position.x < transform.position.x && direction == 1)
                 || (agressor.position.x > transform.position.x && direction == -1))
             {
-                stunValue += stun * 2;
+                CinemachineShake.Instance.StartShake(cameraShakeIntensity, cameraShakeTime);
+                stunValue += stun * critStunPenaltyMultiplier;
+                fromBehind = true;
                 enemyController.CheckNearbyPlayer();
             }
-            else stunValue += stun * stunPenalty;
-
-            enemyController.ApplyBlink();
+            else
+            {
+                CinemachineShake.Instance.StartShake(cameraShakeIntensity / 2, cameraShakeTime / 2);
+                stunValue += stun * stunPenalty;
+            }
+            enemyController.ApplyBlink(fromBehind);
 
             if (currentHealth <= 0)
             {
                 isAlive = false;
                 enemyController.SetHitReciever(false);
                 rb.velocity = new Vector2(0, rb.velocity.y);
-                enemyController.PlayAnimation(EnemyAnimationsList.e_dead);
             }
             else if (stunValue >= stunHandleLimit)
             {
                 rb.velocity = new Vector2(0, rb.velocity.y);
-                enemyController.PlayAnimation(EnemyAnimationsList.e_stun);
                 isStunned = true;
                 stunValue = 0;
                 stunTimer = stunTime;

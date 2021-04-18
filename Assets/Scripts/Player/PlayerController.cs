@@ -28,8 +28,11 @@ namespace Player
 
         private void FixedUpdate()
         {
-            if (!playerHealth.GetIsAlive()) return;
-
+            if (!playerHealth.GetIsAlive())
+            {
+                PlayAnimation(PlayerAnimationsList.p_death);
+                return;
+            }
             if (playerCombat.enabled)
             {
                 playerCombat.AttackInterpreter(

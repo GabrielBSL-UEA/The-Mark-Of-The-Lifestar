@@ -28,14 +28,15 @@ namespace Enemy
 
         private void FixedUpdate()
         {
-            if (!enemyHealth.GetIsAlive() || enemyHealth.GetIsStunned()) return;
+            if (!enemyHealth.GetIsAlive()) PlayAnimation(EnemyAnimationsList.e_dead);
+            else if (enemyHealth.GetIsStunned()) PlayAnimation(EnemyAnimationsList.e_stun);
 
-            enemyMovement.DetectionsInterpreter(
-                enemySense.GetPlayerDetected(),
-                enemySense.GetObstacleDetected(),
-                enemySense.GetinAttackRangeDetector(),
-                enemySense.GetPlayerPosition(),
-                enemyCombat.GetInAttackState());
+            else enemyMovement.DetectionsInterpreter(
+                    enemySense.GetPlayerDetected(),
+                    enemySense.GetObstacleDetected(),
+                    enemySense.GetinAttackRangeDetector(),
+                    enemySense.GetPlayerPosition(),
+                    enemyCombat.GetInAttackState());
         }
 
         public void FlipEnemy()
@@ -58,9 +59,9 @@ namespace Enemy
             enemyAnimation.Play(animation);
         }
 
-        public void ApplyBlink()
+        public void ApplyBlink(bool value)
         {
-            enemyAnimation.Blink();
+            enemyAnimation.Blink(value);
         }
 
         public void SetHitReciever(bool value)

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Camera;
 using Interactible;
 using System;
 
@@ -16,10 +15,6 @@ namespace Player
         [SerializeField] private Transform[] hitDetectors;
         [SerializeField] private float hitRange;
         [SerializeField] private LayerMask hitLayer;
-
-        [Header("Camera Queue")]
-        [SerializeField] private float cameraShakeIntensity = 25f;
-        [SerializeField] private float cameraShakeTime = .15f;
 
         [Header("Attack")]
         [SerializeField] private float attackDamage = 5f;
@@ -142,11 +137,7 @@ namespace Player
                 }
             }
 
-            if(totalObjects > 0)
-            {
-                playerController.ResetInputCounters();
-                CinemachineShake.Instance.StartShake(cameraShakeIntensity, cameraShakeTime);
-            }
+            if(totalObjects > 0) playerController.ResetInputCounters();
         }
 
         //-----------------------------------------------------------------

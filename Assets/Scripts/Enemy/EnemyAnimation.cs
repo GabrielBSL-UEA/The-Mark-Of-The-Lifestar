@@ -4,20 +4,12 @@ using UnityEngine;
 
 namespace Enemy
 {
-    public enum EnemyAnimationsList
-    {
-        e_idle,
-        e_walk,
-        e_attack,
-        e_stun,
-        e_dead
-    }
-
     public class EnemyAnimation : MonoBehaviour
     {
         [SerializeField] private float blinkDuration;
 
         private float blinkDurationTimer = 0;
+        private bool critHit = false;
 
         private EnemyAnimationsList currentAnimation;
         private SpriteRenderer spriteRenderer;
@@ -34,7 +26,8 @@ namespace Enemy
             if (blinkDurationTimer <= 0) return;
 
             blinkDurationTimer -= Time.deltaTime;
-            spriteRenderer.color = new Color(1, (blinkDuration - blinkDurationTimer) / blinkDuration, (blinkDuration - blinkDurationTimer) / blinkDuration);
+            if (critHit) spriteRenderer.color = new Color(1, (blinkDuration - blinkDurationTimer) / blinkDuration, (blinkDuration - blinkDurationTimer) / blinkDuration);
+            else spriteRenderer.color = new Color(1, (blinkDuration - blinkDurationTimer / 2) / blinkDuration, (blinkDuration - blinkDurationTimer / 2) / blinkDuration);
         }
 
         public void Flip()
@@ -52,8 +45,9 @@ namespace Enemy
             currentAnimation = animation;
         }
 
-        public void Blink()
+        public void Blink(bool crit)
         {
+            critHit = crit;
             blinkDurationTimer = blinkDuration;
         }
     }

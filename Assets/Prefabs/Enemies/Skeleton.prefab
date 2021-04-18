@@ -333,9 +333,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 30
+  cameraShakeIntensity: 25
+  cameraShakeTime: 0.15
   stunTime: 1
   stunHandleLimit: 10
   damagePenaltyMultiplier: 1.5
+  critStunPenaltyMultiplier: 2
   stunValueDecreaseOverSecond: 1
 --- !u!114 &2806429995486732495
 MonoBehaviour:
@@ -372,7 +375,7 @@ MonoBehaviour:
   frontRayDistance: 20
   backRayDistance: 0
   playerDetectionRayDistance: 20
-  collisionDetectionOffset: 0
+  collisionDetectionOffset: 0.1
   groundCheckRayValue: 0.2
   groundLayerMask:
     serializedVersion: 2

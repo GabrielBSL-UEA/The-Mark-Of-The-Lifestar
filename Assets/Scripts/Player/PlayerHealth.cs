@@ -14,9 +14,11 @@ namespace Player
         [Header("Health")]
         [SerializeField] private float maxHealth;
 
-        [Header("Hit")]
+        [Header("Camera Queue")]
         [SerializeField] private float cameraShakeIntensity = 40f;
         [SerializeField] private float cameraShakeTime= .2f;
+
+        [Header("Hit")]
         [SerializeField] private float invunerabilityTime;
         [SerializeField] private float hitStunTime;
         
@@ -69,7 +71,6 @@ namespace Player
                 isAlive = false;
                 playerController.SetHitReciever(false);
                 rb.velocity = new Vector2(0, rb.velocity.y);
-                playerController.PlayAnimation(PlayerAnimationsList.p_death);
             }
             else
             {
@@ -78,6 +79,8 @@ namespace Player
                 hitStunTimer = hitStunTime;
                 isInvunerable = true;
                 isStunned = true;
+
+                playerController.PlayAnimation(PlayerAnimationsList.p_hurt);
             }
         }
 
