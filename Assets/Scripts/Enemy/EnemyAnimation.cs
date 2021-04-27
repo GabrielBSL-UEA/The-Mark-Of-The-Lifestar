@@ -50,5 +50,10 @@ namespace Enemy
             critHit = crit;
             blinkDurationTimer = blinkDuration;
         }
+
+        public void DeactivateAnimationScript()
+        {
+            enabled = false;
+        }
     }
 }

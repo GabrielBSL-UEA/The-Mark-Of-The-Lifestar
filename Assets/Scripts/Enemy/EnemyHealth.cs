@@ -18,10 +18,13 @@ namespace Enemy
         [SerializeField] private float cameraShakeIntensity = 25f;
         [SerializeField] private float cameraShakeTime = .15f;
 
+        [Header("Critic")]
+        [SerializeField] private bool acceptCritic = true;
+        [SerializeField] private float critStunPenaltyMultiplier;
+
         [Header("Stun")]
         [SerializeField] private float stunTime;
         [SerializeField] private float stunHandleLimit;
-        [SerializeField] private float critStunPenaltyMultiplier;
         [SerializeField] private float damageStunPenaltyMultiplier;
         [SerializeField] private float stunValueDecreaseOverSecond;
 
@@ -58,15 +61,15 @@ namespace Enemy
             float stunPenalty = isStunned ? .5f : 1f;
 
             float direction = enemyController.GetFacingRightValue();
-            bool fromBehind = false;
+            bool critHit = false;
 
-            if (!isStunned
+            if (acceptCritic && !isStunned
                 && (agressor.position.x < transform.position.x && direction == 1)
                 || (agressor.position.x > transform.position.x && direction == -1))
             {
                 CinemachineShake.Instance.StartShake(cameraShakeIntensity, cameraShakeTime);
                 stunValue += stun * critStunPenaltyMultiplier;
-                fromBehind = true;
+                critHit = true;
                 enemyController.CheckNearbyPlayer();
             }
             else
@@ -74,7 +77,7 @@ namespace Enemy
                 CinemachineShake.Instance.StartShake(cameraShakeIntensity / 2, cameraShakeTime / 2);
                 stunValue += stun * stunPenalty;
             }
-            enemyController.ApplyBlink(fromBehind);
+            enemyController.ApplyBlink(critHit);
 
             if (currentHealth <= 0)
             {
@@ -103,6 +106,15 @@ namespace Enemy
         public bool GetIsStunned()
         {
             return isStunned;
+        }
+
+        //-----------------------------------------------------------------
+        //**********                Set Functions                **********
+        //-----------------------------------------------------------------
+
+        public void SetAcceptCritic(bool value)
+        {
+            acceptCritic = value;
         }
     }
 }

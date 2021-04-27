@@ -28,15 +28,31 @@ namespace Enemy
 
         private void FixedUpdate()
         {
-            if (!enemyHealth.GetIsAlive()) PlayAnimation(EnemyAnimationsList.e_dead);
-            else if (enemyHealth.GetIsStunned()) PlayAnimation(EnemyAnimationsList.e_stun);
-
+            if (!enemyHealth.GetIsAlive())
+            {
+                PlayAnimation(EnemyAnimationsList.e_dead);
+                DeactivateEnemy();
+            }
+            else if (enemyHealth.GetIsStunned())
+            {
+                enemyCombat.AttackReset();
+                PlayAnimation(EnemyAnimationsList.e_stun);
+            }
             else enemyMovement.DetectionsInterpreter(
                     enemySense.GetPlayerDetected(),
                     enemySense.GetObstacleDetected(),
                     enemySense.GetinAttackRangeDetector(),
                     enemySense.GetPlayerPosition(),
                     enemyCombat.GetInAttackState());
+        }
+
+        private void DeactivateEnemy()
+        {
+            enemyHealth.enabled = false;
+            enemySense.enabled = false;
+            enemyCombat.DeactivateComponent();
+            enemyMovement.DeactivateComponent();
+            enabled = false;
         }
 
         public void FlipEnemy()

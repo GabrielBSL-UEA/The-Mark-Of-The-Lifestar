@@ -100,10 +100,28 @@ namespace Enemy
             inBetweenAttacksTimer += Time.deltaTime;
             if (inBetweenAttacksTimer < inBetweenAttacksTime) return;
 
+            AttackReset();
+        }
+
+        public void AttackReset()
+        {
             inAttackState = false;
             afterAttackLock = false;
             inBetweenAttacksTimer = 0;
             startAttackTimer = 0;
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            for (int i = 0; i < hitDetectors.Length; i++)
+            {
+                Gizmos.DrawWireSphere(hitDetectors[i].position, hitRange);
+            }
+        }
+
+        public void DeactivateComponent()
+        {
+            enabled = false;
         }
 
         //-----------------------------------------------------------------
@@ -123,14 +141,6 @@ namespace Enemy
         public bool GetInAttackState()
         {
             return inAttackState;
-        }
-
-        private void OnDrawGizmosSelected()
-        {
-            for (int i = 0; i < hitDetectors.Length; i++)
-            {
-                Gizmos.DrawWireSphere(hitDetectors[i].position, hitRange);
-            }
         }
     }
 }

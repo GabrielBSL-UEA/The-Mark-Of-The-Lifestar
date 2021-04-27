@@ -37,7 +37,6 @@ namespace Player
             {
                 playerCombat.AttackInterpreter(
                     playerInputs.GetHasPressedAttack(),
-                    playerMovement.GetIsDashing(),
                     playerHealth.GetIsStunned());
             }
 
@@ -57,6 +56,11 @@ namespace Player
         public void ResetInputCounters()
         {
             playerInputs.ResetInputCounters();
+        }
+
+        public void ResetPlayerAttack(bool value)
+        {
+            playerCombat.ResetAttack(value);
         }
 
         public void PlayAnimation(PlayerAnimationsList animation)
@@ -141,6 +145,11 @@ namespace Player
         public float GetDashDelayTimer()
         {
             return playerMovement.GetDashDelayRemaining();
+        }
+
+        public bool GetDashPerfomed()
+        {
+            return playerInputs.GetDashPerfomed();
         }
 
         public bool GetDashState()

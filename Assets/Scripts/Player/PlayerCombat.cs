@@ -45,32 +45,35 @@ namespace Player
 
         private void Update()
         {
-            if(attackDelayTimer < attackDelay) attackDelayTimer += Time.deltaTime;
+            if(attackDelayTimer < attackDelay && !playerController.GetDashState()) attackDelayTimer += Time.deltaTime;
         }
 
-        public void AttackInterpreter(bool attackInput, bool dashing, bool stunned)
+        public void AttackInterpreter(bool attackInput, bool stunned)
         {
-            if (stunned) ResetAttack();
+            if (stunned) ResetAttack(false);
 
-            else if (attackDelayTimer < attackDelay || !attackInput) return;
-
-            else if (!isAttacking)
+            else if (attackDelayTimer >= attackDelay && attackInput)
             {
-                rb.gravityScale = 0;
-                rb.velocity = Vector2.zero;
+                if (!isAttacking)
+                {
+                    rb.gravityScale = 0;
+                    rb.velocity = Vector2.zero;
 
-                isAttacking = attackInput;
-                playerController.PlayAnimation(attackAnimations[comboCounter]);
-                comboCounter++;
-            } 
-            else if(canBufferAttack) attackBuffer = attackInput;
+                    isAttacking = attackInput;
+                    playerController.PlayAnimation(attackAnimations[comboCounter]);
+                    comboCounter++;
+                }
+                else if (canBufferAttack) attackBuffer = attackInput;
+            }
         }
 
-        private void ResetAttack()
+        public void ResetAttack(bool resetAttackDelay)
         {
             rb.gravityScale = gravityCache;
-            attackDelayTimer = 0;
             comboCounter = 0;
+
+            if (resetAttackDelay) attackDelayTimer = 0;
+            else attackDelayTimer = attackDelay;
 
             isAttacking = false;
             attackBuffer = false;

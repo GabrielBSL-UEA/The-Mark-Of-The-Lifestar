@@ -12,6 +12,9 @@ namespace Enemy
         attackType GetAttackType();
         float GetAttackRange();
         bool GetInAttackState();
+        void AttackReset();
         void Attack();
+
+        void DeactivateComponent();
     }
 }

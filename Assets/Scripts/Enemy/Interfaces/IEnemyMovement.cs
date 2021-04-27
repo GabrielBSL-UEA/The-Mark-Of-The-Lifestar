@@ -8,5 +8,7 @@ namespace Enemy
     {
         float GetFacingRight();
         void DetectionsInterpreter(bool playerDetected, bool obstacleDetected, bool inAttackRange, Transform playerPosition, bool inAttackState);
+
+        void DeactivateComponent();
     }
 }

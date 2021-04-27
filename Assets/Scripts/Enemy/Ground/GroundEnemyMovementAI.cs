@@ -133,6 +133,11 @@ namespace Enemy
             enemyController.FlipEnemy();
         }
 
+        public void DeactivateComponent()
+        {
+            enabled = false;
+        }
+
         //-----------------------------------------------------------------
         //**********                Get Functions                **********
         //-----------------------------------------------------------------

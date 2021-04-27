@@ -53,17 +53,19 @@ namespace Player
         {
             float direction = playerController.GetMovementInputs().x;
 
-            if (Mathf.Abs(direction) > playerController.GetDeadZone() && !playerController.GetPlayerIsAttacking()) Flip(direction > 0);
+            if (Mathf.Abs(direction) > playerController.GetDeadZone() && (!playerController.GetPlayerIsAttacking() || playerController.GetDashPerfomed())) Flip(direction > 0);
 
-            if (blinking)
+            if (blinking) MakePlayerBlink();
+        }
+
+        private void MakePlayerBlink()
+        {
+            blinkFrequencyTimer += Time.deltaTime;
+
+            if (blinkFrequencyTimer > blinkFrequency)
             {
-                blinkFrequencyTimer += Time.deltaTime;
-
-                if(blinkFrequencyTimer > blinkFrequency)
-                {
-                    spriteRenderer.enabled = !spriteRenderer.enabled;
-                    blinkFrequencyTimer = 0;
-                }
+                spriteRenderer.enabled = !spriteRenderer.enabled;
+                blinkFrequencyTimer = 0;
             }
         }
 

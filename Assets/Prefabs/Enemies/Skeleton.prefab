@@ -335,10 +335,11 @@ MonoBehaviour:
   maxHealth: 30
   cameraShakeIntensity: 25
   cameraShakeTime: 0.15
+  acceptCritic: 1
+  critStunPenaltyMultiplier: 2
   stunTime: 1
   stunHandleLimit: 10
-  damagePenaltyMultiplier: 1.5
-  critStunPenaltyMultiplier: 2
+  damageStunPenaltyMultiplier: 2
   stunValueDecreaseOverSecond: 1
 --- !u!114 &2806429995486732495
 MonoBehaviour:

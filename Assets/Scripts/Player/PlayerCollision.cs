@@ -32,7 +32,7 @@ namespace Player
 
             if (rb.velocity.y >= .1f) canCoyote = false;
             else if (Mathf.Approximately(rb.velocity.y, 0) && isGrounded) canCoyote = true;
-            
+
             if (!IsGrounded())
             {
                 if (coyoteTimer >= coyoteTime || !canCoyote) isGrounded = false;
@@ -54,8 +54,8 @@ namespace Player
 
             bool collisionDetected = rayHit.collider != null;
 
-            if (collisionDetected && rb.velocity.y <= 0 && !isGrounded) playerController.ResetInputCounters();
-
+            if (collisionDetected && isGrounded && rb.velocity.y <= 0) playerController.ResetInputCounters();
+            
             return collisionDetected;
         }
 
@@ -67,11 +67,8 @@ namespace Player
                 0f, new Vector2(playerMovement.x, 0), boxCol2D.bounds.extents.x + collisionDetectionOffset, groundLayerMask);
 
             bool collisionDetected = rayHit.collider != null;
-
-            if (collisionDetected && !IsGrounded() && (Mathf.Abs(playerMovement.x) > 0 || isWallSliding))
-            {
-                return true;
-            }
+            
+            if (collisionDetected && !IsGrounded() && (Mathf.Abs(playerMovement.x) > 0 || isWallSliding)) return true;
             
             return false;
         }

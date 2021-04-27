@@ -140,7 +140,7 @@ namespace Player
 
         private bool canDash()
         {
-            if (playerController.GetDashDelayTimer() > 0 || playerController.GetPlayerIsAttacking()) return false;
+            if (playerController.GetDashDelayTimer() > 0) return false;
 
             if (playerController.GetGroundCollision()) return true;
             else if (airDashCounter < airDashes)

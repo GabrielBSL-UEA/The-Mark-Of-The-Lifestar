@@ -77,7 +77,11 @@ namespace Player
             }
 
             isAttacking = attacking;
-            if (isAttacking) return;
+            if (isAttacking)
+            {
+                if (dashPerfomed) playerController.ResetPlayerAttack(true);
+                else return;
+            }
 
             if(jumpPressed && !wallSliding) antiWallJumpOnFirstContactWhilePressingJump = false;
             else if (!jumpPressed && wallSliding) antiWallJumpOnFirstContactWhilePressingJump = true;
@@ -98,7 +102,7 @@ namespace Player
         private void AnimationCall()
         {
             if (isStunned) playerController.PlayAnimation(PlayerAnimationsList.p_hurt);
-            else if (!isAttacking)
+            else if (!isAttacking || isDashing)
             {
                 if (isDashing) playerController.PlayAnimation(PlayerAnimationsList.p_dash_start);
                 else if (isWallSliding) playerController.PlayAnimation(PlayerAnimationsList.p_wall_slide);
