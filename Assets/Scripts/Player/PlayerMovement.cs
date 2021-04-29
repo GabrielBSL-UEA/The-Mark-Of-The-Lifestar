@@ -19,15 +19,16 @@ namespace Player
         private PlayerController playerController;
         private Vector2 dashDirecton;
 
-        private int facingDirection = 1;
+        public int facingDirection { get; private set; } = 1;
+        public float dashDelayTimer { get; private set; } = 0;
+        public bool isDashing { get; private set; } = false;
+
         private float dashTimer = 0;
-        private float dashDelayTimer = 0;
         private float wallJumpDirection = 0;
         private float wallJumpXImpulseTimer = Mathf.Infinity;
         private bool antiWallJumpOnFirstContactWhilePressingJump = false;
         private bool reverseDash = false;
 
-        private bool isDashing = false;
         private bool isStunned = false;
         private bool isAttacking = false;
         private bool isWallSliding = false;
@@ -248,25 +249,6 @@ namespace Player
         {
             if (jumpHolded) rb.velocity = Vector2.up * jumpForce;
             else if (rb.velocity.y > 0 && !jumpPressed) rb.velocity = new Vector2(rb.velocity.x, 0);
-        }
-
-        //-----------------------------------------------------------------
-        //**********                Get Functions                **********
-        //-----------------------------------------------------------------
-
-        public float GetDashDelayRemaining()
-        {
-            return dashDelayTimer;
-        }
-
-        public bool GetIsDashing()
-        {
-            return isDashing;
-        }
-
-        public float GetFacingDirection()
-        {
-            return facingDirection;
         }
     }
 }

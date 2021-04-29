@@ -28,13 +28,14 @@ namespace Player
         private int airJumpCounter = 0;
         private int airDashCounter = 0;
 
-        private Vector2 movementDirection;
-        private Vector2 dashDirectionCache;
-        private bool jumpHolded = false;
-        private bool hasJumped = false;
+        public Vector2 movementDirection { get; private set; }
+        public Vector2 dashDirectionCache { get; private set; }
+        public bool jumpHolded { get; private set; } = false;
+        public bool hasJumped { get; private set; } = false;
+        public bool dashPerfomed { get; private set; } = false;
+
         private bool hasPressedJump = false;
         private bool jumpBuffer = false;
-        private bool dashPerfomed = false;
         private bool hasPressedDash = false;
         private bool hasPressedAttack = false;
 
@@ -181,31 +182,6 @@ namespace Player
         //-----------------------------------------------------------------
         //**********                Get Functions                **********
         //-----------------------------------------------------------------
-
-        public Vector2 GetMovementDirection()
-        {
-            return movementDirection;
-        }
-
-        public Vector2 GetDashDirectionCache()
-        {
-            return dashDirectionCache;
-        }
-
-        public bool GetJumpHoldValue()
-        {
-            return jumpHolded;
-        }
-
-        public bool GetHasJumped()
-        {
-            return hasJumped;
-        }
-
-        public bool GetDashPerfomed()
-        {
-            return dashPerfomed;
-        }
 
         public bool GetHasPressedAttack()
         {

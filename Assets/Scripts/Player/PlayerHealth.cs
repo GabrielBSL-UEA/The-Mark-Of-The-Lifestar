@@ -21,14 +21,15 @@ namespace Player
         [Header("Hit")]
         [SerializeField] private float invunerabilityTime;
         [SerializeField] private float hitStunTime;
-        
+
+        public bool isAlive { get; private set; } = true; //IHitable variable
+        public bool isStunned { get; private set; } = false;
+        public float agressorDirection { get; private set; }
+
         private float invunerabilityTimer = 0;
         private float hitStunTimer = 0;
         private float currentHealth;
-        private float agressorDirection;
 
-        private bool isAlive = true;
-        private bool isStunned = false;
         private bool isInvunerable = false;
 
         private void Awake()
@@ -82,25 +83,6 @@ namespace Player
 
                 playerController.PlayAnimation(PlayerAnimationsList.p_hurt);
             }
-        }
-
-        //-----------------------------------------------------------------
-        //**********                Get Functions                **********
-        //-----------------------------------------------------------------
-
-        public bool GetIsAlive()
-        {
-            return isAlive;
-        }
-
-        public bool GetIsStunned()
-        {
-            return isStunned;
-        }
-
-        public float GetAgressorDirection()
-        {
-            return agressorDirection;
         }
     }
 }

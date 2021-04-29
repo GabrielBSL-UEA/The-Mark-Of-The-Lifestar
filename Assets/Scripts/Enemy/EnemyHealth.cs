@@ -28,12 +28,12 @@ namespace Enemy
         [SerializeField] private float damageStunPenaltyMultiplier;
         [SerializeField] private float stunValueDecreaseOverSecond;
 
+        public bool isAlive { get; private set; } = true; //IHitable variable
+        public bool isStunned { get; private set; } = false;
+
         private float stunValue = 0;
         private float stunTimer = 0;
-
         private float currentHealth;
-        private bool isAlive = true;
-        private bool isStunned = false;
 
         private void Awake()
         {
@@ -92,29 +92,6 @@ namespace Enemy
                 stunValue = 0;
                 stunTimer = stunTime;
             }
-        }
-
-        //-----------------------------------------------------------------
-        //**********                Get Functions                **********
-        //-----------------------------------------------------------------
-
-        public bool GetIsAlive()
-        {
-            return isAlive;
-        }
-
-        public bool GetIsStunned()
-        {
-            return isStunned;
-        }
-
-        //-----------------------------------------------------------------
-        //**********                Set Functions                **********
-        //-----------------------------------------------------------------
-
-        public void SetAcceptCritic(bool value)
-        {
-            acceptCritic = value;
         }
     }
 }

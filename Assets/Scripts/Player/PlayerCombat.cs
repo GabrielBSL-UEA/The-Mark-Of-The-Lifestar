@@ -28,8 +28,8 @@ namespace Player
             PlayerAnimationsList.p_attack_2
         };
 
+        public bool isAttacking { get; private set; } = false;
         private float gravityCache = 0;
-        private bool isAttacking = false;
         private bool attackBuffer = false;
         private bool canBufferAttack = false;
 
@@ -141,15 +141,6 @@ namespace Player
             }
 
             if(totalObjects > 0) playerController.ResetInputCounters();
-        }
-
-        //-----------------------------------------------------------------
-        //**********                Get Functions                **********
-        //-----------------------------------------------------------------
-
-        public bool GetIsAttacking()
-        {
-            return isAttacking;
         }
 
         //----------------------------------------------------------------

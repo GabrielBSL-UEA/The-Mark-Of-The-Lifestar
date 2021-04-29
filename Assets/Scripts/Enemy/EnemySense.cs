@@ -11,13 +11,14 @@ namespace Enemy
         private EnemyController enemyController;
         private BoxCollider2D boxCol2D;
 
-        private bool playerDetected = false;
-        private bool obstacleDetected = false;
-        private bool inAttackRangeDetector = false;
+        public bool playerDetected { get; private set; } = false;
+        public bool obstacleDetected { get; private set; } = false;
+        public bool inAttackRangeDetector { get; private set; } = false;
+
+        public Transform playerPosition { get; private set; }
 
         private attackType attack;
         private float range;
-        private Transform playerPosition;
 
         [Header("Player Detection")]
         [SerializeField] private Transform enemyEyesPosition;
@@ -205,29 +206,6 @@ namespace Enemy
                 Gizmos.DrawLine(enemyEyesPosition.position, new Vector3((enemyEyesPosition.position.x + frontRayDistance * FacingRight()), enemyEyesPosition.position.y, enemyEyesPosition.position.z));
                 Gizmos.DrawLine(enemyEyesPosition.position, new Vector3((enemyEyesPosition.position.x - backRayDistance * FacingRight()), enemyEyesPosition.position.y, enemyEyesPosition.position.z));
             }
-        }
-        //-----------------------------------------------------------------
-        //**********                Get Functions                **********
-        //-----------------------------------------------------------------
-
-        public bool GetPlayerDetected()
-        {
-            return playerDetected;
-        }
-
-        public bool GetObstacleDetected()
-        {
-            return obstacleDetected;
-        }
-
-        public bool GetinAttackRangeDetector()
-        {
-            return inAttackRangeDetector;
-        }
-
-        public Transform GetPlayerPosition()
-        {
-            return playerPosition;
         }
     }
 }

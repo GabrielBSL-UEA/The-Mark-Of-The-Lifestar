@@ -15,8 +15,8 @@ namespace Player
         [SerializeField] private float collisionDetectionOffset;
 
         private float coyoteTimer = 0;
-        private bool isGrounded;
-        private bool isWallSliding;
+        public bool isGrounded { get; private set; }
+        public bool isWallSliding { get; private set; }
         private bool canCoyote = true;
 
         private void Awake()
@@ -68,23 +68,9 @@ namespace Player
 
             bool collisionDetected = rayHit.collider != null;
             
-            if (collisionDetected && !IsGrounded() && (Mathf.Abs(playerMovement.x) > 0 || isWallSliding)) return true;
+            if (collisionDetected && !IsGrounded() && rb.velocity.y < 0 && (Mathf.Abs(playerMovement.x) > 0 || isWallSliding)) return true;
             
             return false;
-        }
-
-        //-----------------------------------------------------------------
-        //**********                Get Functions                **********
-        //-----------------------------------------------------------------
-
-        public bool GetIsGrounded()
-        {
-            return isGrounded;
-        }
-
-        public bool GetIsWallSliding()
-        {
-            return isWallSliding;
         }
     }
 }

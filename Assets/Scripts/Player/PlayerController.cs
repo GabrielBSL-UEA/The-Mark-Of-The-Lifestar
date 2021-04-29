@@ -28,7 +28,7 @@ namespace Player
 
         private void FixedUpdate()
         {
-            if (!playerHealth.GetIsAlive())
+            if (!playerHealth.isAlive)
             {
                 PlayAnimation(PlayerAnimationsList.p_death);
                 return;
@@ -37,19 +37,19 @@ namespace Player
             {
                 playerCombat.AttackInterpreter(
                     playerInputs.GetHasPressedAttack(),
-                    playerHealth.GetIsStunned());
+                    playerHealth.isStunned);
             }
 
             if (playerMovement.enabled)
             {
                 playerMovement.MovementTranslator(
-                    playerInputs.GetMovementDirection(),
-                    playerInputs.GetJumpHoldValue(),
-                    playerInputs.GetHasJumped(),
-                    playerInputs.GetDashPerfomed(),
-                    playerCollision.GetIsWallSliding(),
-                    playerCombat.GetIsAttacking(),
-                    playerHealth.GetIsStunned());
+                    playerInputs.movementDirection,
+                    playerInputs.jumpHolded,
+                    playerInputs.hasJumped,
+                    playerInputs.dashPerfomed,
+                    playerCollision.isWallSliding,
+                    playerCombat.isAttacking,
+                    playerHealth.isStunned);
             }
         }
 
@@ -124,52 +124,52 @@ namespace Player
 
         public Vector2 GetMovementInputs()
         {
-            return playerInputs.GetMovementDirection();
+            return playerInputs.movementDirection;
         }
 
         public Vector2 GetDashDirection()
         {
-            return playerInputs.GetDashDirectionCache();
+            return playerInputs.dashDirectionCache;
         }
 
         public float GetLastAgressorDirection()
         {
-            return playerHealth.GetAgressorDirection();
+            return playerHealth.agressorDirection;
         }
 
         public float GetFacingDirection()
         {
-            return playerMovement.GetFacingDirection();
+            return playerMovement.facingDirection;
         }
 
         public float GetDashDelayTimer()
         {
-            return playerMovement.GetDashDelayRemaining();
+            return playerMovement.dashDelayTimer;
         }
 
         public bool GetDashPerfomed()
         {
-            return playerInputs.GetDashPerfomed();
+            return playerInputs.dashPerfomed;
         }
 
         public bool GetDashState()
         {
-            return playerMovement.GetIsDashing();
+            return playerMovement.isDashing;
         }
 
         public bool GetPlayerIsAttacking()
         {
-            return playerCombat.GetIsAttacking();
+            return playerCombat.isAttacking;
         }
 
         public bool GetWallSliding()
         {
-            return playerCollision.GetIsWallSliding();
+            return playerCollision.isWallSliding;
         }
 
         public bool GetGroundCollision()
         {
-            return playerCollision.GetIsGrounded();
+            return playerCollision.isGrounded;
         }
 
         public float GetDeadZone()

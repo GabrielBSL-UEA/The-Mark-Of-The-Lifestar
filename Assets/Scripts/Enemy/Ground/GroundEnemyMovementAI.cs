@@ -9,7 +9,7 @@ namespace Enemy
     {
         private Rigidbody2D rb;
         private EnemyController enemyController;
-        private float facingRight = 1; //isFacingRight == 1 -> Looking Right | isFacingRight == -1 -> Looking Left
+        public float facingRight { get; private set; } = 1; //isFacingRight == 1 -> Looking Right | isFacingRight == -1 -> Looking Left
         private bool facingObstacle = false;
 
         [Header("Movement")]
@@ -136,16 +136,6 @@ namespace Enemy
         public void DeactivateComponent()
         {
             enabled = false;
-        }
-
-        //-----------------------------------------------------------------
-        //**********                Get Functions                **********
-        //-----------------------------------------------------------------
-
-
-        public float GetFacingRight()
-        {
-            return facingRight;
         }
     }
 }

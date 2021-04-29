@@ -28,22 +28,22 @@ namespace Enemy
 
         private void FixedUpdate()
         {
-            if (!enemyHealth.GetIsAlive())
+            if (!enemyHealth.isAlive)
             {
                 PlayAnimation(EnemyAnimationsList.e_dead);
                 DeactivateEnemy();
             }
-            else if (enemyHealth.GetIsStunned())
+            else if (enemyHealth.isStunned)
             {
                 enemyCombat.AttackReset();
                 PlayAnimation(EnemyAnimationsList.e_stun);
             }
             else enemyMovement.DetectionsInterpreter(
-                    enemySense.GetPlayerDetected(),
-                    enemySense.GetObstacleDetected(),
-                    enemySense.GetinAttackRangeDetector(),
-                    enemySense.GetPlayerPosition(),
-                    enemyCombat.GetInAttackState());
+                    enemySense.playerDetected,
+                    enemySense.obstacleDetected,
+                    enemySense.inAttackRangeDetector,
+                    enemySense.playerPosition,
+                    enemyCombat.inAttackState);
         }
 
         private void DeactivateEnemy()
@@ -91,7 +91,7 @@ namespace Enemy
 
         public float GetFacingRightValue()
         {
-            return enemyMovement.GetFacingRight();
+            return enemyMovement.facingRight;
         }
 
         public attackType GetAttackType()

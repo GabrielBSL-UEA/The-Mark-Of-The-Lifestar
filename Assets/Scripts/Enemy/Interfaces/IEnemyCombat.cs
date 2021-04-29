@@ -7,11 +7,12 @@ namespace Enemy
 {
     public interface IEnemyCombat
     {
+        bool inAttackState { get; }
+
         void OnAttackEnds();
         void PerformAttackBehavior(int behavior);
         attackType GetAttackType();
         float GetAttackRange();
-        bool GetInAttackState();
         void AttackReset();
         void Attack();
 

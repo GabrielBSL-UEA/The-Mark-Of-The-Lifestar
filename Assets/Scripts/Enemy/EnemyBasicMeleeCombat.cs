@@ -5,12 +5,6 @@ using Interactible;
 
 namespace Enemy
 {
-    public enum attackType
-    {
-        melee,
-        range
-    }
-
     public class EnemyBasicMeleeCombat : MonoBehaviour, IEnemyCombat
     {
         EnemyController enemyController;
@@ -34,7 +28,7 @@ namespace Enemy
         private float startAttackTimer = 0;
         private float inBetweenAttacksTimer = 0;
 
-        private bool inAttackState = false;
+        public bool inAttackState { get; private set; } = false; // IEnemyCombat Variable
         private bool afterAttackLock = false;
 
         private void Awake()
@@ -53,7 +47,7 @@ namespace Enemy
         public void Attack()
         {
             if (afterAttackLock) return;
-            
+
             startAttackTimer += Time.fixedDeltaTime;
 
             if (startAttackTimer < startAttackTime)
@@ -64,7 +58,7 @@ namespace Enemy
             inAttackState = true;
             enemyController.PlayAnimation(EnemyAnimationsList.e_attack);
         }
-
+        
         //-----------------------------------------------------------------
         //**********              Animation Calls                **********
         //-----------------------------------------------------------------
@@ -136,11 +130,6 @@ namespace Enemy
         public float GetAttackRange()
         {
             return attackRange;
-        }
-
-        public bool GetInAttackState()
-        {
-            return inAttackState;
         }
     }
 }

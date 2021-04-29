@@ -6,9 +6,8 @@ namespace Enemy
 {
     public interface IEnemyMovement
     {
-        float GetFacingRight();
+        float facingRight { get; }
         void DetectionsInterpreter(bool playerDetected, bool obstacleDetected, bool inAttackRange, Transform playerPosition, bool inAttackState);
-
         void DeactivateComponent();
     }
 }
