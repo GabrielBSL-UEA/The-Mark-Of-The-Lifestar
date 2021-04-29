@@ -6,7 +6,7 @@ namespace Enemy
 {
     public class EnemyAnimation : MonoBehaviour
     {
-        [SerializeField] private float blinkDuration;
+        [SerializeField] private float blinkDuration = .2f;
 
         private float blinkDurationTimer = 0;
         private bool critHit = false;

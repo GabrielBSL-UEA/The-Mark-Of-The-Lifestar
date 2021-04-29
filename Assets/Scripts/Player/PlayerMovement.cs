@@ -35,26 +35,26 @@ namespace Player
         private bool isWallJumping = false;
 
         [Header("General")]
-        [SerializeField] private float horizontalSpeed = 20f;
-        [SerializeField] private float jumpForce = 15f;
+        [SerializeField] private float horizontalSpeed = 16f;
+        [SerializeField] private float jumpForce = 30f;
 
         [Header("Dash")]
-        [SerializeField] private float dashSpeed;
-        [SerializeField] private float dashDuration;
+        [SerializeField] private float dashSpeed = 40f;
+        [SerializeField] private float dashDuration = .15f;
         [SerializeField] private float dashDelay = .2f;
         [SerializeField] private DashAllDirections dashAllDirections;
 
         [Header("Fall")]
-        [SerializeField] private float fallVelocityLimit;
+        [SerializeField] private float fallVelocityLimit = 30f;
 
         [Header("WallSlide")]
-        [SerializeField] private float wallSlideSpeed;
-        [SerializeField] private float wallJumpXForce;
-        [SerializeField] private float wallJumpXImpulseTime;
+        [SerializeField] private float wallSlideSpeed = 6f;
+        [SerializeField] private float wallJumpXForce = 18f;
+        [SerializeField] private float wallJumpXImpulseTime = .13f;
 
         [Header("Hit")]
-        [SerializeField] private float hitImpulseX;
-        [SerializeField] private float hitImpulseY;
+        [SerializeField] private float hitImpulseX = 30;
+        [SerializeField] private float hitImpulseY = 15;
 
         private void Awake()
         {

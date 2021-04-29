@@ -17,12 +17,12 @@ namespace Enemy
         [SerializeField] private float stunForce = .3f;
 
         [Header("Timers")]
-        [SerializeField] private float startAttackTime;
-        [SerializeField] private float inBetweenAttacksTime;
+        [SerializeField] private float startAttackTime = .5f;
+        [SerializeField] private float inBetweenAttacksTime = .5f;
 
         [Header("Hit")]
         [SerializeField] private Transform[] hitDetectors;
-        [SerializeField] private float hitRange;
+        [SerializeField] private float hitRange = 1.28f;
         [SerializeField] private LayerMask hitLayer;
 
         private float startAttackTimer = 0;

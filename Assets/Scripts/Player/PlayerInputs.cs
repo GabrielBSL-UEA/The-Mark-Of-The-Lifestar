@@ -14,7 +14,7 @@ namespace Player
 
         [Header("Jump")]
         [SerializeField] private float jumpHoldDuration = .15f;
-        [SerializeField] private float minimalJumpTime = .15f;
+        [SerializeField] private float minimalJumpTime = .1f;
         [SerializeField] private float jumpBufferTime = .2f;
         [SerializeField] private int airJumps = 1;
 

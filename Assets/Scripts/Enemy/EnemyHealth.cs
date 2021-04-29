@@ -12,7 +12,7 @@ namespace Enemy
         Rigidbody2D rb;
 
         [Header("Health")]
-        [SerializeField] private float maxHealth;
+        [SerializeField] private float maxHealth = 30;
 
         [Header("Camera Queue")]
         [SerializeField] private float cameraShakeIntensity = 25f;
@@ -20,13 +20,13 @@ namespace Enemy
 
         [Header("Critic")]
         [SerializeField] private bool acceptCritic = true;
-        [SerializeField] private float critStunPenaltyMultiplier;
+        [SerializeField] private float critStunPenaltyMultiplier = 2;
 
         [Header("Stun")]
-        [SerializeField] private float stunTime;
-        [SerializeField] private float stunHandleLimit;
-        [SerializeField] private float damageStunPenaltyMultiplier;
-        [SerializeField] private float stunValueDecreaseOverSecond;
+        [SerializeField] private float stunTime = 1;
+        [SerializeField] private float stunHandleLimit = 10;
+        [SerializeField] private float damageStunPenaltyMultiplier = 2;
+        [SerializeField] private float stunValueDecreaseBySecond = 1;
 
         public bool isAlive { get; private set; } = true; //IHitable variable
         public bool isStunned { get; private set; } = false;
@@ -50,7 +50,7 @@ namespace Enemy
                 else stunTimer -= Time.deltaTime;
             }
 
-            else if (stunValue > 0) stunValue -= stunValueDecreaseOverSecond * Time.deltaTime;
+            else if (stunValue > 0) stunValue -= stunValueDecreaseBySecond * Time.deltaTime;
         }
 
         public void RegisterHit(float damage, float stun, Transform agressor)

@@ -181,6 +181,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -340,7 +341,7 @@ MonoBehaviour:
   stunTime: 1
   stunHandleLimit: 10
   damageStunPenaltyMultiplier: 2
-  stunValueDecreaseOverSecond: 1
+  stunValueDecreaseBySecond: 1
 --- !u!114 &2806429995486732495
 MonoBehaviour:
   m_ObjectHideFlags: 0

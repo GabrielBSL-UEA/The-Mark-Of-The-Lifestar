@@ -11,8 +11,8 @@ namespace Player
         private Rigidbody2D rb;
 
         [SerializeField] private LayerMask groundLayerMask;
-        [SerializeField] private float coyoteTime = .05f;
-        [SerializeField] private float collisionDetectionOffset;
+        [SerializeField] private float coyoteTime = .15f;
+        [SerializeField] private float collisionDetectionOffset = .1f;
 
         private float coyoteTimer = 0;
         public bool isGrounded { get; private set; }

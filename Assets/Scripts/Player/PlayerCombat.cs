@@ -13,13 +13,13 @@ namespace Player
 
         [Header("Hit")]
         [SerializeField] private Transform[] hitDetectors;
-        [SerializeField] private float hitRange;
+        [SerializeField] private float hitRange = .5f;
         [SerializeField] private LayerMask hitLayer;
 
         [Header("Attack")]
         [SerializeField] private float attackDamage = 5f;
-        [SerializeField] private float attackDelay = .7f;
-        [SerializeField] private float stunForce = 1f;
+        [SerializeField] private float attackDelay = .2f;
+        [SerializeField] private float stunForce = 3f;
 
 
         private readonly PlayerAnimationsList[] attackAnimations =

@@ -12,15 +12,15 @@ namespace Player
         Rigidbody2D rb;
 
         [Header("Health")]
-        [SerializeField] private float maxHealth;
+        [SerializeField] private float maxHealth = 50f;
 
         [Header("Camera Queue")]
         [SerializeField] private float cameraShakeIntensity = 40f;
         [SerializeField] private float cameraShakeTime= .2f;
 
         [Header("Hit")]
-        [SerializeField] private float invunerabilityTime;
-        [SerializeField] private float hitStunTime;
+        [SerializeField] private float invunerabilityTime = 1.5f;
+        [SerializeField] private float hitStunTime = .2f;
 
         public bool isAlive { get; private set; } = true; //IHitable variable
         public bool isStunned { get; private set; } = false;
