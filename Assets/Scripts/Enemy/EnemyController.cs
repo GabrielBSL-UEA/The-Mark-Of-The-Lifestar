@@ -1,88 +1,86 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Interactible;
+﻿using UnityEngine;
+using Interactable;
 
 namespace Enemy
 {
-    [RequireComponent(typeof(HitReciever))]
+    [RequireComponent(typeof(HitReceiver))]
     [RequireComponent(typeof(EnemyAnimation))]
     [RequireComponent(typeof(EnemySense))]
     [RequireComponent(typeof(EnemyHealth))]
     public class EnemyController : MonoBehaviour
     {
-        private EnemyAnimation enemyAnimation;
-        private IEnemyMovement enemyMovement;
-        private IEnemyCombat enemyCombat;
-        private EnemyHealth enemyHealth;
-        private EnemySense enemySense;
+        private EnemyAnimation _enemyAnimation;
+        private IEnemyMovement _enemyMovement;
+        private IEnemyCombat _enemyCombat;
+        private EnemyHealth _enemyHealth;
+        private EnemySense _enemySense;
 
         private void Awake()
         {
-            enemyAnimation = GetComponent<EnemyAnimation>();
-            enemyMovement = GetComponent<IEnemyMovement>();
-            enemyCombat = GetComponent<IEnemyCombat>();
-            enemyHealth = GetComponent<EnemyHealth>();
-            enemySense = GetComponent<EnemySense>();
+            _enemyAnimation = GetComponent<EnemyAnimation>();
+            _enemyMovement = GetComponent<IEnemyMovement>();
+            _enemyCombat = GetComponent<IEnemyCombat>();
+            _enemyHealth = GetComponent<EnemyHealth>();
+            _enemySense = GetComponent<EnemySense>();
         }
 
         private void FixedUpdate()
         {
-            if (!enemyHealth.isAlive)
+            if (!_enemyHealth.IsAlive)
             {
                 PlayAnimation(EnemyAnimationsList.e_dead);
                 DeactivateEnemy();
             }
-            else if (enemyHealth.isStunned)
+            else if (_enemyHealth.IsStunned)
             {
-                enemyCombat.AttackReset();
+                _enemyCombat.AttackReset();
                 PlayAnimation(EnemyAnimationsList.e_stun);
             }
-            else enemyMovement.DetectionsInterpreter(
-                    enemySense.playerDetected,
-                    enemySense.obstacleDetected,
-                    enemySense.inAttackRangeDetector,
-                    enemySense.playerPosition,
-                    enemyCombat.inAttackState);
+            else _enemyMovement.DetectionsInterpreter(
+                    _enemySense.PlayerDetected,
+                    _enemySense.ObstacleDetected,
+                    _enemySense.InAttackRangeDetector,
+                    _enemySense.PlayerPosition,
+                    _enemyCombat.InAttackState);
         }
 
         private void DeactivateEnemy()
         {
-            enemyHealth.enabled = false;
-            enemySense.enabled = false;
-            enemyCombat.DeactivateComponent();
-            enemyMovement.DeactivateComponent();
+            _enemyHealth.enabled = false;
+            _enemySense.enabled = false;
+            _enemyCombat.DeactivateComponent();
+            _enemyMovement.DeactivateComponent();
             enabled = false;
         }
 
         public void FlipEnemy()
         {
-            enemyAnimation.Flip();
+            _enemyAnimation.Flip();
         }
 
         public void AttackPlayer()
         {
-            enemyCombat.Attack();
+            _enemyCombat.Attack();
         }
 
         public void CheckNearbyPlayer()
         {
-            enemySense.ForceCheckNearPlayer();
+            _enemySense.ForceCheckNearPlayer();
         }
 
-        public void PlayAnimation(EnemyAnimationsList animation)
+        public void PlayAnimation(EnemyAnimationsList enemyAnimationsList)
         {
-            enemyAnimation.Play(animation);
+            _enemyAnimation.Play(enemyAnimationsList);
         }
 
         public void ApplyBlink(bool value)
         {
-            enemyAnimation.Blink(value);
+            _enemyAnimation.Blink(value);
         }
 
-        public void SetHitReciever(bool value)
+        public void SetHitReceiver(bool value)
         {
-            GetComponent<HitReciever>().SetCanRecieveHit(value);
+            GetComponent<HitReceiver>().SetCanReceivedHit(value);
         }
 
         //-----------------------------------------------------------------
@@ -91,17 +89,17 @@ namespace Enemy
 
         public float GetFacingRightValue()
         {
-            return enemyMovement.facingRight;
+            return _enemyMovement.FacingRight;
         }
 
-        public attackType GetAttackType()
+        public AttackType GetAttackType()
         {
-            return enemyCombat.GetAttackType();
+            return _enemyCombat.GetAttackType();
         }
 
         public float GetAttackRange()
         {
-            return enemyCombat.GetAttackRange();
+            return _enemyCombat.GetAttackRange();
         }
     }
 }

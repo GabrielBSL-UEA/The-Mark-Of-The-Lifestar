@@ -1,74 +1,74 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Player
 {
     public class PlayerCollision : MonoBehaviour
     {
-        private PlayerController playerController;
-        private BoxCollider2D boxCol2D;
-        private Rigidbody2D rb;
+        private PlayerController _playerController;
+        private BoxCollider2D _boxCol2D;
+        private Rigidbody2D _rb;
 
         [SerializeField] private LayerMask groundLayerMask;
         [SerializeField] private float coyoteTime = .15f;
         [SerializeField] private float collisionDetectionOffset = .1f;
 
-        private float coyoteTimer = 0;
-        public bool isGrounded { get; private set; }
-        public bool isWallSliding { get; private set; }
-        private bool canCoyote = true;
+        private float _coyoteTimer;
+        public bool IsGrounded { get; private set; }
+        public bool IsWallSliding { get; private set; }
+        private bool _canCoyote = true;
 
         private void Awake()
         {
-            rb = GetComponent<Rigidbody2D>();
-            boxCol2D = GetComponent<BoxCollider2D>();
-            playerController = GetComponent<PlayerController>();
+            _rb = GetComponent<Rigidbody2D>();
+            _boxCol2D = GetComponent<BoxCollider2D>();
+            _playerController = GetComponent<PlayerController>();
         }
 
         private void FixedUpdate()
         {
-            isWallSliding = IsWallSliding();
+            IsWallSliding = CheckIfPlayerIsWallSliding();
 
-            if (rb.velocity.y >= .1f) canCoyote = false;
-            else if (Mathf.Approximately(rb.velocity.y, 0) && isGrounded) canCoyote = true;
+            if (_rb.velocity.y >= .1f) _canCoyote = false;
+            else if (Mathf.Approximately(_rb.velocity.y, 0) && IsGrounded) _canCoyote = true;
 
-            if (!IsGrounded())
+            if (!CheckIfPlayerIsGrounded())
             {
-                if (coyoteTimer >= coyoteTime || !canCoyote) isGrounded = false;
-                else isGrounded = true;
+                if (_coyoteTimer >= coyoteTime || !_canCoyote) IsGrounded = false;
+                else IsGrounded = true;
                 
-                coyoteTimer += Time.fixedDeltaTime;
+                _coyoteTimer += Time.fixedDeltaTime;
             }
             else
             {
-                isGrounded = true;
-                coyoteTimer = 0;
+                IsGrounded = true;
+                _coyoteTimer = 0;
             }
         }
 
-        private bool IsGrounded()
+        private bool CheckIfPlayerIsGrounded()
         {
-            RaycastHit2D rayHit = Physics2D.BoxCast(boxCol2D.bounds.center, boxCol2D.bounds.size - new Vector3(0f, boxCol2D.bounds.extents.y, 0f), 
-                0f, Vector2.down, boxCol2D.bounds.extents.y + collisionDetectionOffset, groundLayerMask);
+            var bounds = _boxCol2D.bounds;
+            RaycastHit2D rayHit = Physics2D.BoxCast(bounds.center, bounds.size - new Vector3(0f, bounds.extents.y, 0f), 
+                0f, Vector2.down, bounds.extents.y + collisionDetectionOffset, groundLayerMask);
 
             bool collisionDetected = rayHit.collider != null;
 
-            if (collisionDetected && isGrounded && rb.velocity.y <= 0) playerController.ResetInputCounters();
+            if (collisionDetected && IsGrounded && _rb.velocity.y <= 0) _playerController.ResetInputCounters();
             
             return collisionDetected;
         }
 
-        private bool IsWallSliding()
+        private bool CheckIfPlayerIsWallSliding()
         {
-            Vector2 playerMovement = playerController.GetMovementInputs();
+            Vector2 playerMovement = _playerController.GetMovementInputs();
 
-            RaycastHit2D rayHit = Physics2D.BoxCast(boxCol2D.bounds.center, boxCol2D.bounds.size - new Vector3(boxCol2D.bounds.extents.x, 1f, 0f),
-                0f, new Vector2(playerMovement.x, 0), boxCol2D.bounds.extents.x + collisionDetectionOffset, groundLayerMask);
+            var bounds = _boxCol2D.bounds;
+            RaycastHit2D rayHit = Physics2D.BoxCast(bounds.center, bounds.size - new Vector3(bounds.extents.x, 1f, 0f),
+                0f, new Vector2(playerMovement.x, 0), bounds.extents.x + collisionDetectionOffset, groundLayerMask);
 
             bool collisionDetected = rayHit.collider != null;
             
-            if (collisionDetected && !IsGrounded() && rb.velocity.y < 0 && (Mathf.Abs(playerMovement.x) > 0 || isWallSliding)) return true;
+            if (collisionDetected && !CheckIfPlayerIsGrounded() && _rb.velocity.y < 0 && (Mathf.Abs(playerMovement.x) > 0 || IsWallSliding)) return true;
             
             return false;
         }

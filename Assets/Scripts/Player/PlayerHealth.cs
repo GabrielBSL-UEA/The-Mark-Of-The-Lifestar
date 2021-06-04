@@ -1,15 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Interactible;
+﻿using UnityEngine;
+using Interactable;
 using Camera;
 
 namespace Player
 {
-    public class PlayerHealth : MonoBehaviour, IHitable
+    public class PlayerHealth : MonoBehaviour, IHittable
     {
-        PlayerController playerController;
-        Rigidbody2D rb;
+        PlayerController _playerController;
+        Rigidbody2D _rb;
 
         [Header("Health")]
         [SerializeField] private float maxHealth = 50f;
@@ -19,69 +17,69 @@ namespace Player
         [SerializeField] private float cameraShakeTime= .2f;
 
         [Header("Hit")]
-        [SerializeField] private float invunerabilityTime = 1.5f;
+        [SerializeField] private float invulnerabilityTime = 1.5f;
         [SerializeField] private float hitStunTime = .2f;
 
-        public bool isAlive { get; private set; } = true; //IHitable variable
-        public bool isStunned { get; private set; } = false;
-        public float agressorDirection { get; private set; }
+        public bool IsAlive { get; private set; } = true; //Interface variable
+        public bool IsStunned { get; private set; }
+        public float AggressorDirection { get; private set; }
 
-        private float invunerabilityTimer = 0;
-        private float hitStunTimer = 0;
-        private float currentHealth;
+        private float _invulnerabilityTimer;
+        private float _hitStunTimer;
+        private float _currentHealth;
 
-        private bool isInvunerable = false;
+        private bool _isInvulnerable;
 
         private void Awake()
         {
-            playerController = GetComponent<PlayerController>();
-            rb = GetComponent<Rigidbody2D>();
-            currentHealth = maxHealth;
+            _playerController = GetComponent<PlayerController>();
+            _rb = GetComponent<Rigidbody2D>();
+            _currentHealth = maxHealth;
         }
 
         private void Update()
         {
-            if (isStunned)
+            if (IsStunned)
             {
-                if (hitStunTimer < 0) isStunned = false;
-                else hitStunTimer -= Time.deltaTime;
+                if (_hitStunTimer < 0) IsStunned = false;
+                else _hitStunTimer -= Time.deltaTime;
             }
 
-            if (isInvunerable)
+            if (_isInvulnerable)
             {
-                if (invunerabilityTimer < 0)
+                if (_invulnerabilityTimer < 0)
                 {
-                    isInvunerable = false;
-                    playerController.MakePlayerBlink(false);
+                    _isInvulnerable = false;
+                    _playerController.MakePlayerBlink(false);
                 }
-                else invunerabilityTimer -= Time.deltaTime;
+                else _invulnerabilityTimer -= Time.deltaTime;
             }
         }
 
-        public void RegisterHit(float damage, float stun, Transform agressor)
+        public void RegisterHit(float damage, float stun, Transform aggressor)
         {
-            if (!isAlive || isInvunerable || playerController.GetDashState()) return;
+            if (!IsAlive || _isInvulnerable || _playerController.GetDashState()) return;
             
             CinemachineShake.Instance.StartShake(cameraShakeIntensity, cameraShakeTime);
-            agressorDirection = agressor.position.x < transform.position.x ? 1 : -1;
-            currentHealth -= damage;
+            AggressorDirection = aggressor.position.x < transform.position.x ? 1 : -1;
+            _currentHealth -= damage;
 
-            if (currentHealth <= 0)
+            if (_currentHealth <= 0)
             {
-                playerController.EnablePlayerInputs(false);
-                isAlive = false;
-                playerController.SetHitReciever(false);
-                rb.velocity = new Vector2(0, rb.velocity.y);
+                _playerController.EnablePlayerInputs(false);
+                IsAlive = false;
+                _playerController.SetHitReceiver(false);
+                _rb.velocity = new Vector2(0, _rb.velocity.y);
             }
             else
             {
-                invunerabilityTimer = invunerabilityTime;
-                playerController.MakePlayerBlink(true);
-                hitStunTimer = hitStunTime;
-                isInvunerable = true;
-                isStunned = true;
+                _invulnerabilityTimer = invulnerabilityTime;
+                _playerController.MakePlayerBlink(true);
+                _hitStunTimer = hitStunTime;
+                _isInvulnerable = true;
+                IsStunned = true;
 
-                playerController.PlayAnimation(PlayerAnimationsList.p_hurt);
+                _playerController.PlayAnimation(PlayerAnimationsList.p_hurt);
             }
         }
     }

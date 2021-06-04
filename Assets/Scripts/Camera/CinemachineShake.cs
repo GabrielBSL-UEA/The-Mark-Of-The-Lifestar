@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Cinemachine;
 
 namespace Camera
@@ -8,37 +6,37 @@ namespace Camera
     public class CinemachineShake : MonoBehaviour
     {
         public static CinemachineShake Instance { get; private set; }
-        private CinemachineVirtualCamera cinemachineVC;
-        private CinemachineBasicMultiChannelPerlin cinemachineBMCP;
+        private CinemachineVirtualCamera _cinemachineVc;
+        private CinemachineBasicMultiChannelPerlin _cinemachineBmcp;
 
-        private float shakeTime = 0;
-        private float shakeTimer = 0;
-        private float shakeIntensity = 0;
+        private float _shakeTime;
+        private float _shakeTimer;
+        private float _shakeIntensity;
 
         private void Awake()
         {
             Instance = this;
-            cinemachineVC = GetComponent<CinemachineVirtualCamera>();
-            cinemachineBMCP = cinemachineVC.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+            _cinemachineVc = GetComponent<CinemachineVirtualCamera>();
+            _cinemachineBmcp = _cinemachineVc.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
         }
 
-        public void StartShake(float _intensity, float time)
+        public void StartShake(float intensity, float time)
         {
-            cinemachineBMCP.m_AmplitudeGain = _intensity;
+            _cinemachineBmcp.m_AmplitudeGain = intensity;
 
-            shakeIntensity = _intensity;
-            shakeTime = time;
-            shakeTimer = time;
+            _shakeIntensity = intensity;
+            _shakeTime = time;
+            _shakeTimer = time;
         }
 
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
-            if (shakeTimer <= 0) return;
+            if (_shakeTimer <= 0) return;
 
-            shakeTimer -= Time.deltaTime;
+            _shakeTimer -= Time.deltaTime;
 
-            cinemachineBMCP.m_AmplitudeGain = Mathf.Lerp(shakeIntensity, 0f, 1 - (shakeTimer / shakeTime));
+            _cinemachineBmcp.m_AmplitudeGain = Mathf.Lerp(_shakeIntensity, 0f, 1 - (_shakeTimer / _shakeTime));
         }
     }
 }

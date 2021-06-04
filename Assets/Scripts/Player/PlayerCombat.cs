@@ -1,15 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using Interactible;
-using System;
+using Interactable;
 
 namespace Player
 {
     public class PlayerCombat : MonoBehaviour
     {
-        PlayerController playerController;
-        Rigidbody2D rb;
+        PlayerController _playerController;
+        Rigidbody2D _rb;
 
         [Header("Hit")]
         [SerializeField] private Transform[] hitDetectors;
@@ -21,63 +20,62 @@ namespace Player
         [SerializeField] private float attackDelay = .2f;
         [SerializeField] private float stunForce = 3f;
 
-
-        private readonly PlayerAnimationsList[] attackAnimations =
+        private readonly PlayerAnimationsList[] _attackAnimations =
         {
             PlayerAnimationsList.p_attack_1,
             PlayerAnimationsList.p_attack_2
         };
 
-        public bool isAttacking { get; private set; } = false;
-        private float gravityCache = 0;
-        private bool attackBuffer = false;
-        private bool canBufferAttack = false;
+        public bool IsAttacking { get; private set; }
+        private float _gravityCache;
+        private bool _attackBuffer;
+        private bool _canBufferAttack;
 
-        private int comboCounter = 0;
-        private float attackDelayTimer = Mathf.Infinity;
+        private int _comboCounter;
+        private float _attackDelayTimer = Mathf.Infinity;
 
         private void Awake()
         {
-            rb = GetComponent<Rigidbody2D>();
-            gravityCache = rb.gravityScale;
-            playerController = GetComponent<PlayerController>();
+            _rb = GetComponent<Rigidbody2D>();
+            _gravityCache = _rb.gravityScale;
+            _playerController = GetComponent<PlayerController>();
         }
 
         private void Update()
         {
-            if(attackDelayTimer < attackDelay && !playerController.GetDashState()) attackDelayTimer += Time.deltaTime;
+            if(_attackDelayTimer < attackDelay && !_playerController.GetDashState()) _attackDelayTimer += Time.deltaTime;
         }
 
         public void AttackInterpreter(bool attackInput, bool stunned)
         {
             if (stunned) ResetAttack(false);
 
-            else if (attackDelayTimer >= attackDelay && attackInput)
+            else if (_attackDelayTimer >= attackDelay && attackInput)
             {
-                if (!isAttacking)
+                if (!IsAttacking)
                 {
-                    rb.gravityScale = 0;
-                    rb.velocity = Vector2.zero;
+                    _rb.gravityScale = 0;
+                    _rb.velocity = Vector2.zero;
 
-                    isAttacking = attackInput;
-                    playerController.PlayAnimation(attackAnimations[comboCounter]);
-                    comboCounter++;
+                    IsAttacking = true;
+                    _playerController.PlayAnimation(_attackAnimations[_comboCounter]);
+                    _comboCounter++;
                 }
-                else if (canBufferAttack) attackBuffer = attackInput;
+                else if (_canBufferAttack) _attackBuffer = true;
             }
         }
 
         public void ResetAttack(bool resetAttackDelay)
         {
-            rb.gravityScale = gravityCache;
-            comboCounter = 0;
+            _rb.gravityScale = _gravityCache;
+            _comboCounter = 0;
 
-            if (resetAttackDelay) attackDelayTimer = 0;
-            else attackDelayTimer = attackDelay;
+            if (resetAttackDelay) _attackDelayTimer = 0;
+            else _attackDelayTimer = attackDelay;
 
-            isAttacking = false;
-            attackBuffer = false;
-            canBufferAttack = false;
+            IsAttacking = false;
+            _attackBuffer = false;
+            _canBufferAttack = false;
         }
 
         //-----------------------------------------------------------------
@@ -86,61 +84,58 @@ namespace Player
 
         public void ActivateAttackBuffer()
         {
-            canBufferAttack = true;
+            _canBufferAttack = true;
         }
 
         public void OnTransitionStart()
         {
-            rb.gravityScale = gravityCache;
+            _rb.gravityScale = _gravityCache;
         }
 
         public void OnTransitionEnd()
         {
-            if (attackBuffer && comboCounter < attackAnimations.Length)
+            if (_attackBuffer && _comboCounter < _attackAnimations.Length)
             {
-                rb.gravityScale = 0;
-                rb.velocity = Vector2.zero;
-                playerController.PlayAnimation(attackAnimations[comboCounter]);
-                comboCounter++;
+                _rb.gravityScale = 0;
+                _rb.velocity = Vector2.zero;
+                _playerController.PlayAnimation(_attackAnimations[_comboCounter]);
+                _comboCounter++;
             }
             else
             {
-                rb.gravityScale = gravityCache;
-                attackDelayTimer = 0;
-                comboCounter = 0;
-                isAttacking = false;
+                _rb.gravityScale = _gravityCache;
+                _attackDelayTimer = 0;
+                _comboCounter = 0;
+                IsAttacking = false;
             }
-            attackBuffer = false;
-            canBufferAttack = false;
+            _attackBuffer = false;
+            _canBufferAttack = false;
         }
 
         public void DetectHits()
         {
-            List<Transform> objectsList = new List<Transform>();
+            var objectsList = new List<Transform>();
 
-            for (int i = 0; i < hitDetectors.Length; i++)
+            foreach (var circle in hitDetectors)
             {
-                Collider2D[] objectHits = Physics2D.OverlapCircleAll(hitDetectors[i].position, hitRange, hitLayer);
+                var objectHits = Physics2D.OverlapCircleAll(circle.position, hitRange, hitLayer);
 
-                for (int j = 0; j < objectHits.Length; j++)
+                foreach (var hit in objectHits)
                 {
-                    if (objectsList.Contains(objectHits[j].transform)) continue;
-                    objectsList.Add(objectHits[j].transform);
+                    if (objectsList.Contains(hit.transform)) continue;
+                    objectsList.Add(hit.transform);
                 }
             }
 
-            int totalObjects = 0;
+            var totalObjects = 0;
 
-            foreach (Transform hit in objectsList)
+            foreach (var hit in objectsList.Where(hit => hit.GetComponent<HitReceiver>() != null && hit.GetComponent<HitReceiver>().GetCanReceivedHit()))
             {
-                if (hit.GetComponent<HitReciever>() != null && hit.GetComponent<HitReciever>().GetCanRecieveHit())
-                {
-                    hit.GetComponent<HitReciever>().RecieveHit(attackDamage, stunForce, transform);
-                    totalObjects++;
-                }
+                hit.GetComponent<HitReceiver>().ReceivedHit(attackDamage, stunForce, transform);
+                totalObjects++;
             }
 
-            if(totalObjects > 0) playerController.ResetInputCounters();
+            if(totalObjects > 0) _playerController.ResetInputCounters();
         }
 
         //----------------------------------------------------------------
@@ -149,9 +144,9 @@ namespace Player
 
         private void OnDrawGizmosSelected()
         {
-            for (int i = 0; i < hitDetectors.Length; i++)
+            foreach (var circle in hitDetectors)
             {
-                Gizmos.DrawWireSphere(hitDetectors[i].position, hitRange);
+                Gizmos.DrawWireSphere(circle.position, hitRange);
             }
         }
     }

@@ -1,17 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Enemy;
-
-namespace Enemy
+﻿namespace Enemy
 {
     public interface IEnemyCombat
     {
-        bool inAttackState { get; }
+        bool InAttackState { get; }
 
         void OnAttackEnds();
         void PerformAttackBehavior(int behavior);
-        attackType GetAttackType();
+        AttackType GetAttackType();
         float GetAttackRange();
         void AttackReset();
         void Attack();

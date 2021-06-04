@@ -1,38 +1,34 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using static UnityEngine.InputSystem.InputAction;
+﻿using UnityEngine;
 
 namespace Player
 {
     public class PlayerMovement : MonoBehaviour
     {
-        public enum DashAllDirections
+        private enum DashAllDirections
         {
             Horiz,
-            Horiz_Verti,
-            Horiz_Verti_Diago
+            HorizVerti,
+            HorizVertiDiago
         }
 
-        private Rigidbody2D rb;
-        private PlayerController playerController;
-        private Vector2 dashDirecton;
+        private Rigidbody2D _rb;
+        private PlayerController _playerController;
+        private Vector2 _dashDirecton;
 
-        public int facingDirection { get; private set; } = 1;
-        public float dashDelayTimer { get; private set; } = 0;
-        public bool isDashing { get; private set; } = false;
+        public int FacingDirection { get; private set; } = 1;
+        public float DashDelayTimer { get; private set; }
+        public bool IsDashing { get; private set; }
 
-        private float dashTimer = 0;
-        private float wallJumpDirection = 0;
-        private float wallJumpXImpulseTimer = Mathf.Infinity;
-        private bool antiWallJumpOnFirstContactWhilePressingJump = false;
-        private bool reverseDash = false;
+        private float _dashTimer;
+        private float _wallJumpDirection;
+        private float _wallJumpXImpulseTimer = Mathf.Infinity;
+        private bool _antiWallJumpOnFirstContactWhilePressingJump;
+        private bool _reverseDash;
 
-        private bool isStunned = false;
-        private bool isAttacking = false;
-        private bool isWallSliding = false;
-        private bool isWallJumping = false;
+        private bool _isStunned;
+        private bool _isAttacking;
+        private bool _isWallSliding;
+        private bool _isWallJumping;
 
         [Header("General")]
         [SerializeField] private float horizontalSpeed = 16f;
@@ -58,34 +54,34 @@ namespace Player
 
         private void Awake()
         {
-            rb = GetComponent<Rigidbody2D>();
-            playerController = GetComponent<PlayerController>();
+            _rb = GetComponent<Rigidbody2D>();
+            _playerController = GetComponent<PlayerController>();
         }
 
         private void FixedUpdate()
         {
-            if (dashDelayTimer > 0) dashDelayTimer -= Time.fixedDeltaTime;
-            if (isDashing) dashTimer += Time.fixedDeltaTime;
+            if (DashDelayTimer > 0) DashDelayTimer -= Time.fixedDeltaTime;
+            if (IsDashing) _dashTimer += Time.fixedDeltaTime;
         }
 
         public void MovementTranslator(Vector2 movementDirection, bool jumpHolded, bool jumpPressed, bool dashPerfomed, bool wallSliding, bool attacking, bool stunned)
         {
-            isStunned = stunned;
-            if (isStunned)
+            _isStunned = stunned;
+            if (stunned)
             {
                 HitImpulse();
                 return;
             }
 
-            isAttacking = attacking;
-            if (isAttacking)
+            _isAttacking = attacking;
+            if (_isAttacking)
             {
-                if (dashPerfomed) playerController.ResetPlayerAttack(true);
+                if (dashPerfomed) _playerController.ResetPlayerAttack(true);
                 else return;
             }
 
-            if(jumpPressed && !wallSliding) antiWallJumpOnFirstContactWhilePressingJump = false;
-            else if (!jumpPressed && wallSliding) antiWallJumpOnFirstContactWhilePressingJump = true;
+            if(jumpPressed && !wallSliding) _antiWallJumpOnFirstContactWhilePressingJump = false;
+            else if (!jumpPressed && wallSliding) _antiWallJumpOnFirstContactWhilePressingJump = true;
 
             if (wallSliding) WallSlideControl(jumpPressed, movementDirection.x);
             else FallControl();
@@ -102,126 +98,126 @@ namespace Player
 
         private void AnimationCall()
         {
-            if (isStunned) playerController.PlayAnimation(PlayerAnimationsList.p_hurt);
-            else if (!isAttacking || isDashing)
+            if (_isStunned) _playerController.PlayAnimation(PlayerAnimationsList.p_hurt);
+            else if (!_isAttacking || IsDashing)
             {
-                if (isDashing) playerController.PlayAnimation(PlayerAnimationsList.p_dash_start);
-                else if (isWallSliding) playerController.PlayAnimation(PlayerAnimationsList.p_wall_slide);
-                else if (rb.velocity.y > .1f) playerController.PlayAnimation(PlayerAnimationsList.p_jump);
-                else if (rb.velocity.y < -.1f) playerController.PlayAnimation(PlayerAnimationsList.p_jump_to_fall);
-                else if (rb.velocity.x != 0) playerController.PlayAnimation(PlayerAnimationsList.p_run);
-                else playerController.PlayAnimation(PlayerAnimationsList.p_idle);
+                if (IsDashing) _playerController.PlayAnimation(PlayerAnimationsList.p_dash_start);
+                else if (_isWallSliding) _playerController.PlayAnimation(PlayerAnimationsList.p_wall_slide);
+                else if (_rb.velocity.y > .1f) _playerController.PlayAnimation(PlayerAnimationsList.p_jump);
+                else if (_rb.velocity.y < -.1f) _playerController.PlayAnimation(PlayerAnimationsList.p_jump_to_fall);
+                else if (_rb.velocity.x != 0) _playerController.PlayAnimation(PlayerAnimationsList.p_run);
+                else _playerController.PlayAnimation(PlayerAnimationsList.p_idle);
             }
         }
 
         private void HitImpulse()
         {
-            rb.velocity = new Vector2(hitImpulseX * playerController.GetLastAgressorDirection(), hitImpulseY);
-            playerController.ResetInputCounters();
+            _rb.velocity = new Vector2(hitImpulseX * _playerController.GetLastAggressorsDirection(), hitImpulseY);
+            _playerController.ResetInputCounters();
         }
 
         private void FallControl()
         {
-            isWallSliding = false;
+            _isWallSliding = false;
 
-            if (rb.velocity.y < (-fallVelocityLimit)) rb.velocity = new Vector2(rb.velocity.x, -fallVelocityLimit);
+            if (_rb.velocity.y < (-fallVelocityLimit)) _rb.velocity = new Vector2(_rb.velocity.x, -fallVelocityLimit);
         }
 
         private void WallSlideControl(bool jumpPressed, float direction)
         {
-            isWallSliding = true;
+            _isWallSliding = true;
 
-            if (jumpPressed && !isWallJumping && antiWallJumpOnFirstContactWhilePressingJump)
+            if (jumpPressed && !_isWallJumping && _antiWallJumpOnFirstContactWhilePressingJump)
             {
-                wallJumpXImpulseTimer = 0;
+                _wallJumpXImpulseTimer = 0;
 
-                if (direction > 0) wallJumpDirection = 1;
-                else wallJumpDirection = -1;
+                if (direction > 0) _wallJumpDirection = 1;
+                else _wallJumpDirection = -1;
             }
             else
             {
-                if (!jumpPressed) isWallJumping = false;
+                if (!jumpPressed) _isWallJumping = false;
             }
 
-            playerController.ResetInputCounters();
-            rb.velocity = new Vector2(rb.velocity.x, -wallSlideSpeed);
+            _playerController.ResetInputCounters();
+            _rb.velocity = new Vector2(_rb.velocity.x, -wallSlideSpeed);
         }
 
         private void Dash(bool wallSliding)
         {
-            isDashing = true;
+            IsDashing = true;
 
-            if (dashTimer == 0)
+            if (_dashTimer == 0)
             {
-                playerController.EnablePlayerInputs(false);
-                dashDirecton = playerController.GetDashDirection();
-                reverseDash = wallSliding;
+                _playerController.EnablePlayerInputs(false);
+                _dashDirecton = _playerController.GetDashDirection();
+                _reverseDash = wallSliding;
 
-                if (reverseDash) playerController.ForcePlayerFlip();
+                if (_reverseDash) _playerController.ForcePlayerFlip();
             }
             
-            if (dashTimer > dashDuration)
+            if (_dashTimer > dashDuration)
             {
-                isDashing = false;
-                dashDelayTimer = dashDelay;
-                playerController.EnablePlayerInputs(true);
-                dashTimer = 0;
+                IsDashing = false;
+                DashDelayTimer = dashDelay;
+                _playerController.EnablePlayerInputs(true);
+                _dashTimer = 0;
             }
             else
             {
 
-                if (Mathf.Abs(dashDirecton.x) < playerController.GetDeadZone() && Mathf.Abs(dashDirecton.y) < playerController.GetDeadZone())
-                    rb.velocity = Vector2.right * facingDirection * dashSpeed;
+                if (Mathf.Abs(_dashDirecton.x) < _playerController.GetDeadZone() && Mathf.Abs(_dashDirecton.y) < _playerController.GetDeadZone())
+                    _rb.velocity = Vector2.right * (FacingDirection * dashSpeed);
                 
-                else if (reverseDash) rb.velocity = Vector2.right * -facingDirection * dashSpeed;
+                else if (_reverseDash) _rb.velocity = Vector2.right * (-FacingDirection * dashSpeed);
 
                 else
                 {
-                    //Cálculo para o dash em apenas duas direções (Horizontal)
+                    //Two direction calculation
                     if (dashAllDirections == DashAllDirections.Horiz)
                     {
-                        if (dashDirecton.x > 0) rb.velocity = Vector2.right * dashSpeed;
-                        else rb.velocity = Vector2.left * dashSpeed;
+                        if (_dashDirecton.x > 0) _rb.velocity = Vector2.right * dashSpeed;
+                        else _rb.velocity = Vector2.left * dashSpeed;
                     }
 
-                    //Cálculo para o dash em quatro direções (Horizontal e Vertical)
-                    else if (dashAllDirections == DashAllDirections.Horiz_Verti)
+                    //Four direction calculation
+                    else if (dashAllDirections == DashAllDirections.HorizVerti)
                     {
-                        if (Mathf.Abs(dashDirecton.x) >= Mathf.Abs(dashDirecton.y))
+                        if (Mathf.Abs(_dashDirecton.x) >= Mathf.Abs(_dashDirecton.y))
                         {
-                            if (dashDirecton.x > 0) rb.velocity = Vector2.right * dashSpeed;
-                            else rb.velocity = Vector2.left * dashSpeed;
+                            if (_dashDirecton.x > 0) _rb.velocity = Vector2.right * dashSpeed;
+                            else _rb.velocity = Vector2.left * dashSpeed;
                         }
                         else
                         {
-                            if (dashDirecton.y > 0) rb.velocity = Vector2.up * dashSpeed;
-                            else rb.velocity = Vector2.down * dashSpeed;
+                            if (_dashDirecton.y > 0) _rb.velocity = Vector2.up * dashSpeed;
+                            else _rb.velocity = Vector2.down * dashSpeed;
                         }
                     }
 
-                    //Cálculo para o dash em oito direções (Horizontal, Vertical e Diagonal)
-                    else
+                    //Eight direction calculation
+                    else if (dashAllDirections == DashAllDirections.HorizVertiDiago)
                     {
-                        if (Mathf.Abs(dashDirecton.x) >= 2 * Mathf.Abs(dashDirecton.y))
+                        if (Mathf.Abs(_dashDirecton.x) >= 2 * Mathf.Abs(_dashDirecton.y))
                         {
-                            if (dashDirecton.x > 0) rb.velocity = Vector2.right * dashSpeed;
-                            else rb.velocity = Vector2.left * dashSpeed;
+                            if (_dashDirecton.x > 0) _rb.velocity = Vector2.right * dashSpeed;
+                            else _rb.velocity = Vector2.left * dashSpeed;
                         }
-                        else if (Mathf.Abs(dashDirecton.y) >= 2 * Mathf.Abs(dashDirecton.x))
+                        else if (Mathf.Abs(_dashDirecton.y) >= 2 * Mathf.Abs(_dashDirecton.x))
                         {
-                            if (dashDirecton.y > 0) rb.velocity = Vector2.up * dashSpeed;
-                            else rb.velocity = Vector2.down * dashSpeed;
+                            if (_dashDirecton.y > 0) _rb.velocity = Vector2.up * dashSpeed;
+                            else _rb.velocity = Vector2.down * dashSpeed;
                         }
                         else
                         {
                             float x, y;
 
-                            if (dashDirecton.x > 0) x = 1;
+                            if (_dashDirecton.x > 0) x = 1;
                             else x = -1;
-                            if (dashDirecton.y > 0) y = 1;
+                            if (_dashDirecton.y > 0) y = 1;
                             else y = -1;
 
-                            rb.velocity = new Vector2(x / Mathf.Sqrt(2), y / Mathf.Sqrt(2)) * dashSpeed;
+                            _rb.velocity = new Vector2(x / Mathf.Sqrt(2), y / Mathf.Sqrt(2)) * dashSpeed;
                         }
                     }
                 }
@@ -230,25 +226,25 @@ namespace Player
 
         private void Move(Vector2 movementDirection)
         {
-            if(wallJumpXImpulseTimer > wallJumpXImpulseTime)
+            if(_wallJumpXImpulseTimer > wallJumpXImpulseTime)
             {
-                if (transform.localScale.x > 0) facingDirection = 1;
-                else if (transform.localScale.x < 0) facingDirection = -1;
+                if (transform.localScale.x > 0) FacingDirection = 1;
+                else if (transform.localScale.x < 0) FacingDirection = -1;
 
-                if (Mathf.Abs(movementDirection.x) > playerController.GetDeadZone()) rb.velocity = new Vector2(horizontalSpeed * facingDirection, rb.velocity.y);
-                else rb.velocity = new Vector2(0, rb.velocity.y);
+                if (Mathf.Abs(movementDirection.x) > _playerController.GetDeadZone()) _rb.velocity = new Vector2(horizontalSpeed * FacingDirection, _rb.velocity.y);
+                else _rb.velocity = new Vector2(0, _rb.velocity.y);
             }
             else
             {
-                rb.velocity = new Vector2(wallJumpXForce * -wallJumpDirection, rb.velocity.y);
-                wallJumpXImpulseTimer += Time.fixedDeltaTime;
+                _rb.velocity = new Vector2(wallJumpXForce * -_wallJumpDirection, _rb.velocity.y);
+                _wallJumpXImpulseTimer += Time.fixedDeltaTime;
             }
         }
 
         private void Jump(bool jumpHolded, bool jumpPressed)
         {
-            if (jumpHolded) rb.velocity = Vector2.up * jumpForce;
-            else if (rb.velocity.y > 0 && !jumpPressed) rb.velocity = new Vector2(rb.velocity.x, 0);
+            if (jumpHolded) _rb.velocity = Vector2.up * jumpForce;
+            else if (_rb.velocity.y > 0 && !jumpPressed) _rb.velocity = new Vector2(_rb.velocity.x, 0);
         }
     }
 }

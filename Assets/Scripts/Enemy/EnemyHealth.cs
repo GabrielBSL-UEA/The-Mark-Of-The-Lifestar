@@ -1,15 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Interactible;
+﻿using UnityEngine;
+using Interactable;
 using Camera;
 
 namespace Enemy
 {
-    public class EnemyHealth : MonoBehaviour, IHitable
+    public class EnemyHealth : MonoBehaviour, IHittable
     {
-        EnemyController enemyController;
-        Rigidbody2D rb;
+        EnemyController _enemyController;
+        Rigidbody2D _rb;
 
         [Header("Health")]
         [SerializeField] private float maxHealth = 30;
@@ -20,7 +18,7 @@ namespace Enemy
 
         [Header("Critic")]
         [SerializeField] private bool acceptCritic = true;
-        [SerializeField] private float critStunPenaltyMultiplier = 2;
+        [SerializeField] private float criticStunPenaltyMultiplier = 2;
 
         [Header("Stun")]
         [SerializeField] private float stunTime = 1;
@@ -28,69 +26,69 @@ namespace Enemy
         [SerializeField] private float damageStunPenaltyMultiplier = 2;
         [SerializeField] private float stunValueDecreaseBySecond = 1;
 
-        public bool isAlive { get; private set; } = true; //IHitable variable
-        public bool isStunned { get; private set; } = false;
+        public bool IsAlive { get; private set; } = true; //IHittable variable
+        public bool IsStunned { get; private set; }
 
-        private float stunValue = 0;
-        private float stunTimer = 0;
-        private float currentHealth;
+        private float _stunValue;
+        private float _stunTimer;
+        private float _currentHealth;
 
         private void Awake()
         {
-            enemyController = GetComponent<EnemyController>();
-            rb = GetComponent<Rigidbody2D>();
-            currentHealth = maxHealth;
+            _enemyController = GetComponent<EnemyController>();
+            _rb = GetComponent<Rigidbody2D>();
+            _currentHealth = maxHealth;
         }
 
         private void Update()
         {
-            if (isStunned)
+            if (IsStunned)
             {
-                if (stunTimer < 0) isStunned = false;
-                else stunTimer -= Time.deltaTime;
+                if (_stunTimer < 0) IsStunned = false;
+                else _stunTimer -= Time.deltaTime;
             }
 
-            else if (stunValue > 0) stunValue -= stunValueDecreaseBySecond * Time.deltaTime;
+            else if (_stunValue > 0) _stunValue -= stunValueDecreaseBySecond * Time.deltaTime;
         }
 
-        public void RegisterHit(float damage, float stun, Transform agressor)
+        public void RegisterHit(float damage, float stun, Transform aggressor)
         {
-            if (!isAlive) return;
+            if (!IsAlive) return;
 
-            currentHealth = isStunned ? currentHealth - (damage * damageStunPenaltyMultiplier) : currentHealth - damage;
-            float stunPenalty = isStunned ? .5f : 1f;
+            _currentHealth = IsStunned ? _currentHealth - (damage * damageStunPenaltyMultiplier) : _currentHealth - damage;
+            var stunPenalty = IsStunned ? .5f : 1f;
 
-            float direction = enemyController.GetFacingRightValue();
-            bool critHit = false;
+            var direction = _enemyController.GetFacingRightValue();
+            var criticHit = false;
 
-            if (acceptCritic && !isStunned
-                && (agressor.position.x < transform.position.x && direction == 1)
-                || (agressor.position.x > transform.position.x && direction == -1))
+            if (acceptCritic && !IsStunned
+                && (aggressor.position.x < transform.position.x && Mathf.Approximately(direction, 1))
+                || (aggressor.position.x > transform.position.x && Mathf.Approximately(direction, -1)))
             {
                 CinemachineShake.Instance.StartShake(cameraShakeIntensity, cameraShakeTime);
-                stunValue += stun * critStunPenaltyMultiplier;
-                critHit = true;
-                enemyController.CheckNearbyPlayer();
+                _stunValue += stun * criticStunPenaltyMultiplier;
+                criticHit = true;
+                _enemyController.CheckNearbyPlayer();
             }
             else
             {
                 CinemachineShake.Instance.StartShake(cameraShakeIntensity / 2, cameraShakeTime / 2);
-                stunValue += stun * stunPenalty;
+                _stunValue += stun * stunPenalty;
             }
-            enemyController.ApplyBlink(critHit);
+            _enemyController.ApplyBlink(criticHit);
 
-            if (currentHealth <= 0)
+            if (_currentHealth <= 0)
             {
-                isAlive = false;
-                enemyController.SetHitReciever(false);
-                rb.velocity = new Vector2(0, rb.velocity.y);
+                IsAlive = false;
+                _enemyController.SetHitReceiver(false);
+                _rb.velocity = new Vector2(0, _rb.velocity.y);
             }
-            else if (stunValue >= stunHandleLimit)
+            else if (_stunValue >= stunHandleLimit)
             {
-                rb.velocity = new Vector2(0, rb.velocity.y);
-                isStunned = true;
-                stunValue = 0;
-                stunTimer = stunTime;
+                _rb.velocity = new Vector2(0, _rb.velocity.y);
+                IsStunned = true;
+                _stunValue = 0;
+                _stunTimer = stunTime;
             }
         }
     }

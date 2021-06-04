@@ -1,12 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 namespace Enemy
 {
-    public enum attackType
+    public enum AttackType
     {
-        melee,
-        range
+        Melee,
+        Range
     }
 }

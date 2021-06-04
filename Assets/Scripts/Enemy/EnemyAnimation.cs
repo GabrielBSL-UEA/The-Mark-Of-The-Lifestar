@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Enemy
 {
@@ -8,47 +6,49 @@ namespace Enemy
     {
         [SerializeField] private float blinkDuration = .2f;
 
-        private float blinkDurationTimer = 0;
-        private bool critHit = false;
+        private float _blinkDurationTimer;
+        private bool _criticHit;
 
-        private EnemyAnimationsList currentAnimation;
-        private SpriteRenderer spriteRenderer;
-        private Animator anim;
+        private EnemyAnimationsList _currentAnimation;
+        private SpriteRenderer _spriteRenderer;
+        private Animator _anim;
 
         private void Awake()
         {
-            anim = GetComponent<Animator>();
-            spriteRenderer = GetComponent<SpriteRenderer>();
+            _anim = GetComponent<Animator>();
+            _spriteRenderer = GetComponent<SpriteRenderer>();
         }
 
         private void Update()
         {
-            if (blinkDurationTimer <= 0) return;
+            if (_blinkDurationTimer <= 0) return;
 
-            blinkDurationTimer -= Time.deltaTime;
-            if (critHit) spriteRenderer.color = new Color(1, (blinkDuration - blinkDurationTimer) / blinkDuration, (blinkDuration - blinkDurationTimer) / blinkDuration);
-            else spriteRenderer.color = new Color(1, (blinkDuration - blinkDurationTimer / 2) / blinkDuration, (blinkDuration - blinkDurationTimer / 2) / blinkDuration);
+            _blinkDurationTimer -= Time.deltaTime;
+            if (_criticHit) _spriteRenderer.color = new Color(1, (blinkDuration - _blinkDurationTimer) / blinkDuration, (blinkDuration - _blinkDurationTimer) / blinkDuration);
+            else _spriteRenderer.color = new Color(1, (blinkDuration - _blinkDurationTimer / 2) / blinkDuration, (blinkDuration - _blinkDurationTimer / 2) / blinkDuration);
         }
 
         public void Flip()
         {
-            Vector2 scaler = transform.localScale;
+            var enemyTransform = transform;
+            
+            Vector2 scaler = enemyTransform.localScale;
             scaler.x *= -1;
-            transform.localScale = scaler;
+            enemyTransform.localScale = scaler;
         }
 
-        public void Play(EnemyAnimationsList animation)
+        public void Play(EnemyAnimationsList enemyAnimationsList)
         {
-            if (currentAnimation.Equals(animation)) return;
+            if (_currentAnimation.Equals(enemyAnimationsList)) return;
 
-            anim.Play(animation.ToString());
-            currentAnimation = animation;
+            _anim.Play(enemyAnimationsList.ToString());
+            _currentAnimation = enemyAnimationsList;
         }
 
-        public void Blink(bool crit)
+        public void Blink(bool critic)
         {
-            critHit = crit;
-            blinkDurationTimer = blinkDuration;
+            _criticHit = critic;
+            _blinkDurationTimer = blinkDuration;
         }
 
         public void DeactivateAnimationScript()

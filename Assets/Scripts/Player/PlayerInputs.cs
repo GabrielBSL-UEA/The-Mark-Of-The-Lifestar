@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputAction;
 
 namespace Player
 {
     public class PlayerInputs : MonoBehaviour
     {
-        private PlayerActionControl inputActions;
-        private PlayerController playerController;
+        private PlayerActionControl _inputActions;
+        private PlayerController _playerController;
 
         [Header("Jump")]
         [SerializeField] private float jumpHoldDuration = .15f;
@@ -22,108 +19,108 @@ namespace Player
         [SerializeField] private float dashBufferTime = .2f;
         [SerializeField] private int airDashes = 1;
 
-        private float jumpHoldTime = 0;
-        private float jumpBufferTimer = 0;
-        private float dashBufferTimer = 0;
-        private int airJumpCounter = 0;
-        private int airDashCounter = 0;
+        private float _jumpHoldTime;
+        private float _jumpBufferTimer;
+        private float _dashBufferTimer;
+        private int _airJumpCounter;
+        private int _airDashCounter;
 
-        public Vector2 movementDirection { get; private set; }
-        public Vector2 dashDirectionCache { get; private set; }
-        public bool jumpHolded { get; private set; } = false;
-        public bool hasJumped { get; private set; } = false;
-        public bool dashPerfomed { get; private set; } = false;
+        public Vector2 MovementDirection { get; private set; }
+        public Vector2 DashDirectionCache { get; private set; }
+        public bool JumpHolded { get; private set; }
+        public bool HasJumped { get; private set; }
+        public bool DashPerfomed { get; private set; }
 
-        private bool hasPressedJump = false;
-        private bool jumpBuffer = false;
-        private bool hasPressedDash = false;
-        private bool hasPressedAttack = false;
+        private bool _hasPressedJump;
+        private bool _jumpBuffer;
+        private bool _hasPressedDash;
+        private bool _hasPressedAttack;
 
         private void Awake()
         {
-            inputActions = new PlayerActionControl();
-            playerController = GetComponent<PlayerController>();
+            _inputActions = new PlayerActionControl();
+            _playerController = GetComponent<PlayerController>();
 
-            inputActions.Land.Move.performed += ctx => movementDirection = ctx.ReadValue<Vector2>();
-            inputActions.Land.Move.canceled += ctx => movementDirection = Vector2.zero;
+            _inputActions.Land.Move.performed += ctx => MovementDirection = ctx.ReadValue<Vector2>();
+            _inputActions.Land.Move.canceled += ctx => MovementDirection = Vector2.zero;
 
-            inputActions.Land.Jump.performed += ctx => Jump(ctx);
-            inputActions.Land.Jump.canceled += ctx => Jump(ctx);
+            _inputActions.Land.Jump.performed += Jump;
+            _inputActions.Land.Jump.canceled += Jump;
 
-            inputActions.Land.Dash.performed += ctx => Dash(ctx);
-            inputActions.Land.Dash.canceled += ctx => Dash(ctx);
+            _inputActions.Land.Dash.performed += Dash;
+            _inputActions.Land.Dash.canceled += Dash;
 
-            inputActions.Land.Attack.performed += ctx => Attack(ctx);
-            inputActions.Land.Attack.canceled += ctx => Attack(ctx);
+            _inputActions.Land.Attack.performed += Attack;
+            _inputActions.Land.Attack.canceled += Attack;
         }
 
         private void OnEnable()
         {
-            inputActions.Enable();
+            _inputActions.Enable();
         }
         private void OnDisable()
         {
-            inputActions.Disable();
+            _inputActions.Disable();
         }
 
-        void Update()
+        private void Update()
         {
-            if (jumpHoldTime >= jumpHoldDuration) jumpHolded = false;
-            else jumpHoldTime += Time.deltaTime;
+            if (_jumpHoldTime >= jumpHoldDuration) JumpHolded = false;
+            else _jumpHoldTime += Time.deltaTime;
 
-            if(jumpBufferTimer < jumpBufferTime && hasPressedJump && CanJump()) ConfirmJump();
-            else jumpBufferTimer += Time.deltaTime;
+            if(_jumpBufferTimer < jumpBufferTime && _hasPressedJump && CanJump()) ConfirmJump();
+            else _jumpBufferTimer += Time.deltaTime;
 
-            if (dashBufferTimer < dashBufferTime && hasPressedDash && canDash()) ConfirmDash();
-            else dashBufferTimer += Time.deltaTime;
+            if (_dashBufferTimer < dashBufferTime && _hasPressedDash && CanDash()) ConfirmDash();
+            else _dashBufferTimer += Time.deltaTime;
         }
-        
-        public void Jump(CallbackContext ctx)
+
+        private void Jump(CallbackContext ctx)
         {
             if (ctx.performed)
             {
-                jumpBufferTimer = 0;
-                hasPressedJump = true;
-                jumpBuffer = true;
+                _jumpBufferTimer = 0;
+                _hasPressedJump = true;
+                _jumpBuffer = true;
             }
 
             else if (ctx.canceled)
             {
-                jumpHolded = false;
-                jumpBuffer = false;
-                StartCoroutine(JumpReleasedDelay(minimalJumpTime - jumpHoldTime));
+                JumpHolded = false;
+                _jumpBuffer = false;
+                StartCoroutine(JumpReleasedDelay(minimalJumpTime - _jumpHoldTime));
             }
         }
 
         private void ConfirmJump()
         {
-            jumpHolded = jumpBuffer;
-            hasJumped = true;
-            hasPressedJump = false;
-            jumpBufferTimer = 0;
-            jumpHoldTime = 0;
+            JumpHolded = _jumpBuffer;
+            HasJumped = true;
+            _hasPressedJump = false;
+            _jumpBufferTimer = 0;
+            _jumpHoldTime = 0;
         }
 
         private void ConfirmDash()
         {
-            dashBufferTimer = 0;
-            dashPerfomed = true;
-            hasPressedDash = false;
-            dashDirectionCache = movementDirection;
+            _dashBufferTimer = 0;
+            DashPerfomed = true;
+            _hasPressedDash = false;
+            DashDirectionCache = MovementDirection;
         }
 
         IEnumerator JumpReleasedDelay(float time)
         {
             yield return new WaitForSeconds(time);
-            hasJumped = false;
+            HasJumped = false;
         }
 
         private bool CanJump()
         {
-            if (playerController.GetGroundCollision() || playerController.GetWallSliding()) return true;
-            else if (airJumpCounter < airJumps)
+            if (_playerController.GetGroundCollision() || _playerController.GetWallSliding()) return true;
+            else if (_airJumpCounter < airJumps)
             {
-                airJumpCounter++;
+                _airJumpCounter++;
                 return true;
             }
 
@@ -132,51 +129,50 @@ namespace Player
 
         private void Dash(CallbackContext ctx)
         {
-            if (ctx.performed)
-            {
-                dashBufferTimer = 0;
-                hasPressedDash = true;
-            }
+            if (!ctx.performed) return;
+            
+            _dashBufferTimer = 0;
+            _hasPressedDash = true;
         }
 
-        private bool canDash()
+        private bool CanDash()
         {
-            if (playerController.GetDashDelayTimer() > 0) return false;
+            if (_playerController.GetDashDelayTimer() > 0) return false;
 
-            if (playerController.GetGroundCollision()) return true;
-            else if (airDashCounter < airDashes)
+            if (_playerController.GetGroundCollision()) return true;
+            else if (_airDashCounter < airDashes)
             {
-                airDashCounter++;
+                _airDashCounter++;
                 return true;
             }
 
             return false;
         }
 
-        public void Attack(CallbackContext ctx)
+        private void Attack(CallbackContext ctx)
         {
             if (ctx.performed)
             {
-                hasPressedAttack = true;
+                _hasPressedAttack = true;
             }
         }
 
         public void ResetInputCounters()
         {
-            if (dashPerfomed) return;
+            if (DashPerfomed) return;
 
-            airJumpCounter = 0;
-            airDashCounter = 0;
+            _airJumpCounter = 0;
+            _airDashCounter = 0;
         }
 
         public void ActivatePlayerInputs(bool value)
         {
             if (value)
             {
-                dashPerfomed = false;
-                inputActions.Enable();
+                DashPerfomed = false;
+                _inputActions.Enable();
             }
-            else inputActions.Disable();
+            else _inputActions.Disable();
         }
 
         //-----------------------------------------------------------------
@@ -185,8 +181,8 @@ namespace Player
 
         public bool GetHasPressedAttack()
         {
-            bool attack = hasPressedAttack;
-            hasPressedAttack = false;
+            bool attack = _hasPressedAttack;
+            _hasPressedAttack = false;
 
             return attack;
         }

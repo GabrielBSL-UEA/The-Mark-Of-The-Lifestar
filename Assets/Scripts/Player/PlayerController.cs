@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Interactible;
+﻿using UnityEngine;
+using Interactable;
 
 namespace Player
 {
@@ -9,89 +7,89 @@ namespace Player
     {
         [SerializeField] private float deadZone = .4f;
 
-        PlayerInputs playerInputs;
-        PlayerHealth playerHealth;
-        PlayerCombat playerCombat;
-        PlayerMovement playerMovement;
-        PlayerCollision playerCollision;
-        PlayerAnimations playerAnimations;
+        PlayerInputs _playerInputs;
+        PlayerHealth _playerHealth;
+        PlayerCombat _playerCombat;
+        PlayerMovement _playerMovement;
+        PlayerCollision _playerCollision;
+        PlayerAnimations _playerAnimations;
 
         private void Awake()
         {
-            playerAnimations = GetComponent<PlayerAnimations>();
-            playerCollision = GetComponent<PlayerCollision>();
-            playerMovement = GetComponent<PlayerMovement>();
-            playerInputs = GetComponent<PlayerInputs>();
-            playerHealth = GetComponent<PlayerHealth>();
-            playerCombat = GetComponent<PlayerCombat>();
+            _playerAnimations = GetComponent<PlayerAnimations>();
+            _playerCollision = GetComponent<PlayerCollision>();
+            _playerMovement = GetComponent<PlayerMovement>();
+            _playerInputs = GetComponent<PlayerInputs>();
+            _playerHealth = GetComponent<PlayerHealth>();
+            _playerCombat = GetComponent<PlayerCombat>();
         }
 
         private void FixedUpdate()
         {
-            if (!playerHealth.isAlive)
+            if (!_playerHealth.IsAlive)
             {
                 PlayAnimation(PlayerAnimationsList.p_death);
                 return;
             }
-            if (playerCombat.enabled)
+            if (_playerCombat.enabled)
             {
-                playerCombat.AttackInterpreter(
-                    playerInputs.GetHasPressedAttack(),
-                    playerHealth.isStunned);
+                _playerCombat.AttackInterpreter(
+                    _playerInputs.GetHasPressedAttack(),
+                    _playerHealth.IsStunned);
             }
 
-            if (playerMovement.enabled)
+            if (_playerMovement.enabled)
             {
-                playerMovement.MovementTranslator(
-                    playerInputs.movementDirection,
-                    playerInputs.jumpHolded,
-                    playerInputs.hasJumped,
-                    playerInputs.dashPerfomed,
-                    playerCollision.isWallSliding,
-                    playerCombat.isAttacking,
-                    playerHealth.isStunned);
+                _playerMovement.MovementTranslator(
+                    _playerInputs.MovementDirection,
+                    _playerInputs.JumpHolded,
+                    _playerInputs.HasJumped,
+                    _playerInputs.DashPerfomed,
+                    _playerCollision.IsWallSliding,
+                    _playerCombat.IsAttacking,
+                    _playerHealth.IsStunned);
             }
         }
 
         public void ResetInputCounters()
         {
-            playerInputs.ResetInputCounters();
+            _playerInputs.ResetInputCounters();
         }
 
         public void ResetPlayerAttack(bool value)
         {
-            playerCombat.ResetAttack(value);
+            _playerCombat.ResetAttack(value);
         }
 
-        public void PlayAnimation(PlayerAnimationsList animation)
+        public void PlayAnimation(PlayerAnimationsList playerAnimationsList)
         {
-            playerAnimations.Play(animation);
+            _playerAnimations.Play(playerAnimationsList);
         }
 
         public void EnablePlayerInputs(bool value)
         {
-            playerInputs.ActivatePlayerInputs(value);
+            _playerInputs.ActivatePlayerInputs(value);
         }
 
         public void EnablePlayerMovements(bool value)
         {
-            if (playerMovement.enabled == value) return;
-            playerMovement.enabled = value;
+            if (_playerMovement.enabled == value) return;
+            _playerMovement.enabled = value;
         }
 
         public void MakePlayerBlink(bool value)
         {
-            playerAnimations.StartBlink(value);
+            _playerAnimations.StartBlink(value);
         }
 
         public void ForcePlayerFlip()
         {
-            playerAnimations.ForceFlip();
+            _playerAnimations.ForceFlip();
         }
 
-        public void SetHitReciever(bool value)
+        public void SetHitReceiver(bool value)
         {
-            GetComponent<HitReciever>().SetCanRecieveHit(value);
+            GetComponent<HitReceiver>().SetCanReceivedHit(value);
         }
 
         //-----------------------------------------------------------------
@@ -100,22 +98,22 @@ namespace Player
 
         public void EnableAttackBuffer()
         {
-            playerCombat.ActivateAttackBuffer();
+            _playerCombat.ActivateAttackBuffer();
         }
 
         public void RegisterAttackHits()
         {
-            playerCombat.DetectHits();
+            _playerCombat.DetectHits();
         }
 
         public void AttackTransitionStart()
         {
-            playerCombat.OnTransitionStart();
+            _playerCombat.OnTransitionStart();
         }
 
         public void AttackTransitionEnds()
         {
-            playerCombat.OnTransitionEnd();
+            _playerCombat.OnTransitionEnd();
         }
 
         //-----------------------------------------------------------------
@@ -124,52 +122,52 @@ namespace Player
 
         public Vector2 GetMovementInputs()
         {
-            return playerInputs.movementDirection;
+            return _playerInputs.MovementDirection;
         }
 
         public Vector2 GetDashDirection()
         {
-            return playerInputs.dashDirectionCache;
+            return _playerInputs.DashDirectionCache;
         }
 
-        public float GetLastAgressorDirection()
+        public float GetLastAggressorsDirection()
         {
-            return playerHealth.agressorDirection;
+            return _playerHealth.AggressorDirection;
         }
 
         public float GetFacingDirection()
         {
-            return playerMovement.facingDirection;
+            return _playerMovement.FacingDirection;
         }
 
         public float GetDashDelayTimer()
         {
-            return playerMovement.dashDelayTimer;
+            return _playerMovement.DashDelayTimer;
         }
 
         public bool GetDashPerfomed()
         {
-            return playerInputs.dashPerfomed;
+            return _playerInputs.DashPerfomed;
         }
 
         public bool GetDashState()
         {
-            return playerMovement.isDashing;
+            return _playerMovement.IsDashing;
         }
 
         public bool GetPlayerIsAttacking()
         {
-            return playerCombat.isAttacking;
+            return _playerCombat.IsAttacking;
         }
 
         public bool GetWallSliding()
         {
-            return playerCollision.isWallSliding;
+            return _playerCollision.IsWallSliding;
         }
 
         public bool GetGroundCollision()
         {
-            return playerCollision.isGrounded;
+            return _playerCollision.IsGrounded;
         }
 
         public float GetDeadZone()

@@ -1,24 +1,22 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Linq;
 using UnityEngine;
-using Interactible;
+using Interactable;
 
 namespace Enemy
 {
     public class EnemySense : MonoBehaviour
     {
-        private EnemyController enemyController;
-        private BoxCollider2D boxCol2D;
+        private EnemyController _enemyController;
+        private BoxCollider2D _boxCol2D;
 
-        public bool playerDetected { get; private set; } = false;
-        public bool obstacleDetected { get; private set; } = false;
-        public bool inAttackRangeDetector { get; private set; } = false;
+        public bool PlayerDetected { get; private set; }
+        public bool ObstacleDetected { get; private set; }
+        public bool InAttackRangeDetector { get; private set; }
 
-        public Transform playerPosition { get; private set; }
+        public Transform PlayerPosition { get; private set; }
 
-        private attackType attack;
-        private float range;
+        private AttackType _attack;
+        private float _range;
 
         [Header("Player Detection")]
         [SerializeField] private Transform enemyEyesPosition;
@@ -28,7 +26,7 @@ namespace Enemy
 
         [Header("Melee")]
         [SerializeField] private float frontRayDistance = 20f;
-        [SerializeField] private float backRayDistance = 0f;
+        [SerializeField] private float backRayDistance;
 
         [Header("Range")]
         [SerializeField] private float playerDetectionRayDistance = 20f;
@@ -39,58 +37,58 @@ namespace Enemy
         [SerializeField] private LayerMask groundLayerMask;
 
         [Header("Debug")]
-        [SerializeField] private bool activateGizmos = false;
+        [SerializeField] private bool activateGizmos;
 
         private void Awake()
         {
-            enemyController = GetComponent<EnemyController>();
-            boxCol2D = GetComponent<BoxCollider2D>();
+            _enemyController = GetComponent<EnemyController>();
+            _boxCol2D = GetComponent<BoxCollider2D>();
         }
 
         private void Start()
         {
-            attack = enemyController.GetAttackType();
-            range = enemyController.GetAttackRange();
+            _attack = _enemyController.GetAttackType();
+            _range = _enemyController.GetAttackRange();
         }
 
         // Update is called once per frame
         private void FixedUpdate()
         {
-            obstacleDetected = CheckWall() || !CheckEdge();
+            ObstacleDetected = CheckWall() || !CheckEdge();
 
-            if (playerDetected) {
-                if (!CheckNearPlayer(awarenessRayDistance)) playerDetected = false;
-                else inAttackRangeDetector = CheckInAttackRange(range);
+            if (PlayerDetected) {
+                if (!CheckNearPlayer(awarenessRayDistance)) PlayerDetected = false;
+                else InAttackRangeDetector = CheckInAttackRange(_range);
             }
             else
             {
-                if ((attack == attackType.melee && CheckPlayerGround()) ||
-                    (attack == attackType.range && CheckNearPlayer(playerDetectionRayDistance)))
-                    playerDetected = true;
+                if ((_attack == AttackType.Melee && CheckPlayerGround()) ||
+                    (_attack == AttackType.Range && CheckNearPlayer(playerDetectionRayDistance)))
+                    PlayerDetected = true;
             }
         }
 
         private bool CheckPlayerGround()
         {
-            RaycastHit2D[] rayHitFront = Physics2D.RaycastAll(enemyEyesPosition.position, Vector2.right * FacingRight(), frontRayDistance);
-            RaycastHit2D[] rayHitBack = Physics2D.RaycastAll(enemyEyesPosition.position, Vector2.right * -FacingRight(), backRayDistance);
+            var position = enemyEyesPosition.position;
+            
+            var rayHitFront = Physics2D.RaycastAll(position, Vector2.right * FacingRight(), frontRayDistance);
+            var rayHitBack = Physics2D.RaycastAll(position, Vector2.right * -FacingRight(), backRayDistance);
 
-            for (int i = 0; i < rayHitFront.Length; i++)
+            foreach (var hit in rayHitFront)
             {
-                if (rayHitFront[i].transform.CompareTag(playerTag) && CanRecieveHits(rayHitFront[i].transform))
-                {
-                    playerPosition = rayHitFront[i].transform;
-                    return true;
-                }
+                if (!hit.transform.CompareTag(playerTag) || !CanReceivedHits(hit.transform)) continue;
+                
+                PlayerPosition = hit.transform;
+                return true;
             }
 
-            for (int i = 0; i < rayHitBack.Length; i++)
+            foreach (var hit in rayHitBack)
             {
-                if (rayHitBack[i].transform.CompareTag(playerTag) && CanRecieveHits(rayHitBack[i].transform))
-                {
-                    playerPosition = rayHitBack[i].transform;
-                    return true;
-                }
+                if (!hit.transform.CompareTag(playerTag) || !CanReceivedHits(hit.transform)) continue;
+                
+                PlayerPosition = hit.transform;
+                return true;
             }
 
             return false;
@@ -98,113 +96,100 @@ namespace Enemy
 
         private bool CheckNearPlayer(float rayRange)
         {
-            RaycastHit2D[] rayHit = Physics2D.CircleCastAll(enemyEyesPosition.position, rayRange, Vector2.zero);
+            var rayHit = Physics2D.CircleCastAll(enemyEyesPosition.position, rayRange, Vector2.zero);
 
-            for (int i = 0; i < rayHit.Length; i++)
+            foreach (var hit in rayHit)
             {
-                if (rayHit[i].transform.CompareTag(playerTag) && CanRecieveHits(rayHit[i].transform))
-                {
-                    playerPosition = rayHit[i].transform;
-                    return true;
-                }
+                if (!hit.transform.CompareTag(playerTag) || !CanReceivedHits(hit.transform)) continue;
+                
+                PlayerPosition = hit.transform;
+                return true;
             }
             return false;
         }
 
         private bool CheckInAttackRange(float rayRange)
         {
-            if (attack == attackType.melee)
+            if (_attack == AttackType.Melee)
             {
-                RaycastHit2D[] rayHitEyes;
-                RaycastHit2D[] rayHitFeet;
+                var rayHitEyes = Physics2D.RaycastAll(enemyEyesPosition.position, Vector2.right * FacingRight(), rayRange);
+                var rayHitFeet = Physics2D.RaycastAll(enemyFeetPosition.position, Vector2.right * FacingRight(), rayRange);
 
-                rayHitEyes = Physics2D.RaycastAll(enemyEyesPosition.position, Vector2.right * FacingRight(), rayRange);
-                rayHitFeet = Physics2D.RaycastAll(enemyFeetPosition.position, Vector2.right * FacingRight(), rayRange);
-
-                for (int i = 0; i < rayHitEyes.Length; i++)
+                foreach (var hit in rayHitEyes)
                 {
-                    if (rayHitEyes[i].transform.CompareTag(playerTag) && CanRecieveHits(rayHitEyes[i].transform))
-                    {
-                        playerPosition = rayHitEyes[i].transform;
-                        return true;
-                    }
+                    if (!hit.transform.CompareTag(playerTag) || !CanReceivedHits(hit.transform)) continue;
+                    
+                    PlayerPosition = hit.transform;
+                    return true;
                 }
 
-                for (int i = 0; i < rayHitFeet.Length; i++)
+                foreach (var hit in rayHitFeet)
                 {
-                    if (rayHitFeet[i].transform.CompareTag(playerTag) && CanRecieveHits(rayHitFeet[i].transform))
-                    {
-                        playerPosition = rayHitFeet[i].transform;
-                        return true;
-                    }
+                    if (!hit.transform.CompareTag(playerTag) || !CanReceivedHits(hit.transform)) continue;
+                    
+                    PlayerPosition = hit.transform;
+                    return true;
                 }
             }
             else
             {
-                RaycastHit2D[] rayHit;
-                rayHit = Physics2D.CircleCastAll(enemyEyesPosition.position, rayRange, Vector2.zero);
+                var rayHit = Physics2D.CircleCastAll(enemyEyesPosition.position, rayRange, Vector2.zero);
 
-                for (int i = 0; i < rayHit.Length; i++)
-                {
-                    if (rayHit[i].transform.CompareTag(playerTag) && CanRecieveHits(rayHit[i].transform)) return true;
-                }
+                return rayHit.Any(hit => hit.transform.CompareTag(playerTag) && CanReceivedHits(hit.transform));
             }
             return false;
         }
 
         private bool CheckWall()
         {
-            RaycastHit2D rayHit = Physics2D.BoxCast(boxCol2D.bounds.center, boxCol2D.bounds.size - new Vector3(boxCol2D.bounds.extents.x, collisionDetectionOffset, 0f),
-                0f, new Vector2(FacingRight(), 0), boxCol2D.bounds.extents.x + collisionDetectionOffset, groundLayerMask);
+            var bounds = _boxCol2D.bounds;
+            var rayHit = Physics2D.BoxCast(bounds.center, bounds.size - new Vector3(bounds.extents.x, collisionDetectionOffset, 0f),
+                0f, new Vector2(FacingRight(), 0), bounds.extents.x + collisionDetectionOffset, groundLayerMask);
 
-            if (rayHit.collider != null) return true;
-            
-            return false;
+            return rayHit.collider != null;
         }
 
         private bool CheckEdge()
         {
-            RaycastHit2D[] rayHit = Physics2D.RaycastAll(boxCol2D.bounds.center + new Vector3(boxCol2D.bounds.extents.x * FacingRight(), 0, 0), Vector2.down, boxCol2D.bounds.extents.y + groundCheckRayValue);
+            var bounds = _boxCol2D.bounds;
+            var rayHit = Physics2D.RaycastAll(bounds.center + new Vector3(bounds.extents.x * FacingRight(), 0, 0), Vector2.down, bounds.extents.y + groundCheckRayValue);
 
-            for (int i = 0; i < rayHit.Length; i++)
-            {
-                if (rayHit[i].transform.gameObject.layer == Mathf.Log(groundLayerMask.value, 2)) return true;
-            }
-
-            return false;
+            return rayHit.Any(hit => Mathf.Approximately(hit.transform.gameObject.layer, Mathf.Log(groundLayerMask.value, 2)));
         }
 
         public void ForceCheckNearPlayer()
         {
-            if (CheckNearPlayer(playerDetectionRayDistance)) playerDetected = true;
+            if (CheckNearPlayer(playerDetectionRayDistance)) PlayerDetected = true;
         }
 
-        private bool CanRecieveHits(Transform player)
+        private static bool CanReceivedHits(Component player)
         {
-            return player.GetComponent<HitReciever>().GetCanRecieveHit();
+            return player.GetComponent<HitReceiver>().GetCanReceivedHit();
         }
 
         private float FacingRight()
         {
-            return enemyController.GetFacingRightValue();
+            return _enemyController.GetFacingRightValue();
         }
 
         private void OnDrawGizmosSelected()
         {
             if (!activateGizmos) return;
 
-            if (playerDetected)
+            var eyesPosition = enemyEyesPosition.position;
+            
+            if (PlayerDetected)
             {
                 Gizmos.color = Color.white;
-                Gizmos.DrawWireSphere(enemyEyesPosition.position, awarenessRayDistance);
+                Gizmos.DrawWireSphere(eyesPosition, awarenessRayDistance);
                 Gizmos.color = Color.red;
-                Gizmos.DrawLine(enemyEyesPosition.position, new Vector3((enemyEyesPosition.position.x + range * FacingRight()), enemyEyesPosition.position.y, enemyEyesPosition.position.z));
-                Gizmos.DrawLine(enemyFeetPosition.position, new Vector3((enemyFeetPosition.position.x + range * FacingRight()), enemyFeetPosition.position.y, enemyFeetPosition.position.z));
+                Gizmos.DrawLine(eyesPosition, new Vector3((eyesPosition.x + _range * FacingRight()), eyesPosition.y, eyesPosition.z));
+                Gizmos.DrawLine(eyesPosition, new Vector3((eyesPosition.x + _range * FacingRight()), eyesPosition.y, eyesPosition.z));
             }
             else
             {
-                Gizmos.DrawLine(enemyEyesPosition.position, new Vector3((enemyEyesPosition.position.x + frontRayDistance * FacingRight()), enemyEyesPosition.position.y, enemyEyesPosition.position.z));
-                Gizmos.DrawLine(enemyEyesPosition.position, new Vector3((enemyEyesPosition.position.x - backRayDistance * FacingRight()), enemyEyesPosition.position.y, enemyEyesPosition.position.z));
+                Gizmos.DrawLine(eyesPosition, new Vector3((eyesPosition.x + frontRayDistance * FacingRight()), eyesPosition.y, eyesPosition.z));
+                Gizmos.DrawLine(eyesPosition, new Vector3((eyesPosition.x - backRayDistance * FacingRight()), eyesPosition.y, eyesPosition.z));
             }
         }
     }

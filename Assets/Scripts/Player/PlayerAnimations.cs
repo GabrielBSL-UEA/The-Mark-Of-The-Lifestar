@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Player
 {
@@ -27,83 +25,82 @@ namespace Player
     {
         [SerializeField] private float blinkFrequency = .05f;
 
-        private float blinkFrequencyTimer = 0;
+        private float _blinkFrequencyTimer;
 
-        private Rigidbody2D rb;
-        private Animator anim;
-        private SpriteRenderer spriteRenderer;
-        private PlayerController playerController;
+        private Animator _anim;
+        private SpriteRenderer _spriteRenderer;
+        private PlayerController _playerController;
 
-        private bool facingRight = true;
-        private bool blinking = false;
+        private bool _facingRight = true;
+        private bool _blinking;
 
-        private PlayerAnimationsList currentAnimation;
+        private PlayerAnimationsList _currentAnimation;
 
         // Start is called before the first frame update
         private void Awake()
         {
-            playerController = GetComponent<PlayerController>();
-            spriteRenderer = GetComponent<SpriteRenderer>();
-            rb = GetComponent<Rigidbody2D>();
-            anim = GetComponent<Animator>();
+            _playerController = GetComponent<PlayerController>();
+            _spriteRenderer = GetComponent<SpriteRenderer>();
+            _anim = GetComponent<Animator>();
         }
 
         // Update is called once per frame
         void Update()
         {
-            float direction = playerController.GetMovementInputs().x;
+            float direction = _playerController.GetMovementInputs().x;
 
-            if (Mathf.Abs(direction) > playerController.GetDeadZone() && (!playerController.GetPlayerIsAttacking() || playerController.GetDashPerfomed())) Flip(direction > 0);
+            if (Mathf.Abs(direction) > _playerController.GetDeadZone() && (!_playerController.GetPlayerIsAttacking() || _playerController.GetDashPerfomed())) Flip(direction > 0);
 
-            if (blinking) MakePlayerBlink();
+            if (_blinking) MakePlayerBlink();
         }
 
         private void MakePlayerBlink()
         {
-            blinkFrequencyTimer += Time.deltaTime;
+            _blinkFrequencyTimer += Time.deltaTime;
 
-            if (blinkFrequencyTimer > blinkFrequency)
+            if (_blinkFrequencyTimer > blinkFrequency)
             {
-                spriteRenderer.enabled = !spriteRenderer.enabled;
-                blinkFrequencyTimer = 0;
+                _spriteRenderer.enabled = !_spriteRenderer.enabled;
+                _blinkFrequencyTimer = 0;
             }
         }
 
-        public void Flip(bool right)
+        private void Flip(bool right)
         {
-            if (facingRight == right) return;
-
-            Vector2 scaler = transform.localScale;
+            if (_facingRight == right) return;
+            var playerTransform = transform;
+            
+            Vector2 scaler = playerTransform.localScale;
             scaler.x *= -1;
-            transform.localScale = scaler;
-            facingRight = right;
+            playerTransform.localScale = scaler;
+            _facingRight = right;
         }
 
         public void ForceFlip()
         {
-            Flip(!facingRight);
+            Flip(!_facingRight);
         }
 
-        public void Play(PlayerAnimationsList animation)
+        public void Play(PlayerAnimationsList playerAnimationsList)
         {
-            if (currentAnimation.Equals(animation)) return;
+            if (_currentAnimation.Equals(playerAnimationsList)) return;
 
-            //Exceções
-            if (animation == PlayerAnimationsList.p_jump_to_fall && currentAnimation == PlayerAnimationsList.p_fall) return;
-            if (animation == PlayerAnimationsList.p_dash_start && currentAnimation == PlayerAnimationsList.p_dash) return;
-            if (animation == PlayerAnimationsList.p_jump_to_fall && currentAnimation != PlayerAnimationsList.p_jump) animation = PlayerAnimationsList.p_fall;
-            //Exceções
+            //Exceptions
+            if (playerAnimationsList == PlayerAnimationsList.p_jump_to_fall && _currentAnimation == PlayerAnimationsList.p_fall) return;
+            if (playerAnimationsList == PlayerAnimationsList.p_dash_start && _currentAnimation == PlayerAnimationsList.p_dash) return;
+            if (playerAnimationsList == PlayerAnimationsList.p_jump_to_fall && _currentAnimation != PlayerAnimationsList.p_jump) playerAnimationsList = PlayerAnimationsList.p_fall;
+            //Exceptions
 
-            anim.Play(animation.ToString());
+            _anim.Play(playerAnimationsList.ToString());
 
-            currentAnimation = animation;
+            _currentAnimation = playerAnimationsList;
         }
 
         public void StartBlink(bool value)
         {
-            blinking = value;
+            _blinking = value;
 
-            if (!value) spriteRenderer.enabled = true;
+            if (!value) _spriteRenderer.enabled = true;
         }
     }
 }

@@ -1,17 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Interactible;
+﻿using UnityEngine;
+using Interactable;
 
 namespace Enemy
 {
     public class EnemyBasicMeleeCombat : MonoBehaviour, IEnemyCombat
     {
-        EnemyController enemyController;
-        Rigidbody2D rb;
+        EnemyController _enemyController;
 
         [Header("Type")]
-        [SerializeField] private attackType attackType;
+        [SerializeField] private AttackType attackType;
         [SerializeField] private float attackRange = 2f;
         [SerializeField] private float attackDamage = 3f;
         [SerializeField] private float stunForce = .3f;
@@ -25,38 +22,37 @@ namespace Enemy
         [SerializeField] private float hitRange = 1.28f;
         [SerializeField] private LayerMask hitLayer;
 
-        private float startAttackTimer = 0;
-        private float inBetweenAttacksTimer = 0;
+        private float _startAttackTimer;
+        private float _inBetweenAttacksTimer;
 
-        public bool inAttackState { get; private set; } = false; // IEnemyCombat Variable
-        private bool afterAttackLock = false;
+        public bool InAttackState { get; private set; } // IEnemyCombat Variable
+        private bool _afterAttackLock;
 
         private void Awake()
         {
-            rb = GetComponent<Rigidbody2D>();
-            enemyController = GetComponent<EnemyController>();
+            _enemyController = GetComponent<EnemyController>();
         }
 
         private void Update()
         {
-            if (!afterAttackLock) return;
+            if (!_afterAttackLock) return;
 
             AttackDelay();
         }
 
         public void Attack()
         {
-            if (afterAttackLock) return;
+            if (_afterAttackLock) return;
 
-            startAttackTimer += Time.fixedDeltaTime;
+            _startAttackTimer += Time.fixedDeltaTime;
 
-            if (startAttackTimer < startAttackTime)
+            if (_startAttackTimer < startAttackTime)
             {
-                enemyController.PlayAnimation(EnemyAnimationsList.e_idle);
+                _enemyController.PlayAnimation(EnemyAnimationsList.e_idle);
                 return;
             }
-            inAttackState = true;
-            enemyController.PlayAnimation(EnemyAnimationsList.e_attack);
+            InAttackState = true;
+            _enemyController.PlayAnimation(EnemyAnimationsList.e_attack);
         }
         
         //-----------------------------------------------------------------
@@ -67,9 +63,9 @@ namespace Enemy
         {
             Transform player = null;
 
-            for (int i = 0; i < hitDetectors.Length; i++)
+            foreach (var circle in hitDetectors)
             {
-                Collider2D collision = Physics2D.OverlapCircle(hitDetectors[i].position, hitRange, hitLayer);
+                var collision = Physics2D.OverlapCircle(circle.position, hitRange, hitLayer);
 
                 if (collision == null) continue;
 
@@ -78,38 +74,38 @@ namespace Enemy
 
             if (player == null) return;
 
-            player.GetComponent<HitReciever>().RecieveHit(attackDamage, stunForce, transform);
+            player.GetComponent<HitReceiver>().ReceivedHit(attackDamage, stunForce, transform);
         }
 
         public void OnAttackEnds()
         {
-            afterAttackLock = true;
+            _afterAttackLock = true;
 
         } 
 
         private void AttackDelay()
         {
-            enemyController.PlayAnimation(EnemyAnimationsList.e_idle);
+            _enemyController.PlayAnimation(EnemyAnimationsList.e_idle);
 
-            inBetweenAttacksTimer += Time.deltaTime;
-            if (inBetweenAttacksTimer < inBetweenAttacksTime) return;
+            _inBetweenAttacksTimer += Time.deltaTime;
+            if (_inBetweenAttacksTimer < inBetweenAttacksTime) return;
 
             AttackReset();
         }
 
         public void AttackReset()
         {
-            inAttackState = false;
-            afterAttackLock = false;
-            inBetweenAttacksTimer = 0;
-            startAttackTimer = 0;
+            InAttackState = false;
+            _afterAttackLock = false;
+            _inBetweenAttacksTimer = 0;
+            _startAttackTimer = 0;
         }
 
         private void OnDrawGizmosSelected()
         {
-            for (int i = 0; i < hitDetectors.Length; i++)
+            foreach (var circle in hitDetectors)
             {
-                Gizmos.DrawWireSphere(hitDetectors[i].position, hitRange);
+                Gizmos.DrawWireSphere(circle.position, hitRange);
             }
         }
 
@@ -122,7 +118,7 @@ namespace Enemy
         //**********                Get Functions                **********
         //-----------------------------------------------------------------
 
-        public attackType GetAttackType()
+        public AttackType GetAttackType()
         {
             return attackType;
         }
