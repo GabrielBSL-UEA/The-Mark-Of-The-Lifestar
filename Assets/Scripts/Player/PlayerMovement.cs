@@ -13,7 +13,7 @@ namespace Player
 
         private Rigidbody2D _rb;
         private PlayerController _playerController;
-        private Vector2 _dashDirecton;
+        private Vector2 _dashDirection;
 
         public int FacingDirection { get; private set; } = 1;
         public float DashDelayTimer { get; private set; }
@@ -64,7 +64,7 @@ namespace Player
             if (IsDashing) _dashTimer += Time.fixedDeltaTime;
         }
 
-        public void MovementTranslator(Vector2 movementDirection, bool jumpHolded, bool jumpPressed, bool dashPerfomed, bool wallSliding, bool attacking, bool stunned)
+        public void MovementTranslator(Vector2 movementDirection, bool jumpHeld, bool jumpPressed, bool dashPerformed, bool wallSliding, bool attacking, bool stunned)
         {
             _isStunned = stunned;
             if (stunned)
@@ -76,7 +76,7 @@ namespace Player
             _isAttacking = attacking;
             if (_isAttacking)
             {
-                if (dashPerfomed) _playerController.ResetPlayerAttack(true);
+                if (dashPerformed) _playerController.ResetPlayerAttack(true);
                 else return;
             }
 
@@ -86,10 +86,10 @@ namespace Player
             if (wallSliding) WallSlideControl(jumpPressed, movementDirection.x);
             else FallControl();
 
-            if (dashPerfomed) Dash(wallSliding);
+            if (dashPerformed) Dash(wallSliding);
             else
             {
-                Jump(jumpHolded, jumpPressed);
+                Jump(jumpHeld, jumpPressed);
                 Move(movementDirection);
             }
 
@@ -150,7 +150,7 @@ namespace Player
             if (_dashTimer == 0)
             {
                 _playerController.EnablePlayerInputs(false);
-                _dashDirecton = _playerController.GetDashDirection();
+                _dashDirection = _playerController.GetDashDirection();
                 _reverseDash = wallSliding;
 
                 if (_reverseDash) _playerController.ForcePlayerFlip();
@@ -166,7 +166,7 @@ namespace Player
             else
             {
 
-                if (Mathf.Abs(_dashDirecton.x) < _playerController.GetDeadZone() && Mathf.Abs(_dashDirecton.y) < _playerController.GetDeadZone())
+                if (Mathf.Abs(_dashDirection.x) < _playerController.GetDeadZone() && Mathf.Abs(_dashDirection.y) < _playerController.GetDeadZone())
                     _rb.velocity = Vector2.right * (FacingDirection * dashSpeed);
                 
                 else if (_reverseDash) _rb.velocity = Vector2.right * (-FacingDirection * dashSpeed);
@@ -176,21 +176,21 @@ namespace Player
                     //Two direction calculation
                     if (dashAllDirections == DashAllDirections.Horiz)
                     {
-                        if (_dashDirecton.x > 0) _rb.velocity = Vector2.right * dashSpeed;
+                        if (_dashDirection.x > 0) _rb.velocity = Vector2.right * dashSpeed;
                         else _rb.velocity = Vector2.left * dashSpeed;
                     }
 
                     //Four direction calculation
                     else if (dashAllDirections == DashAllDirections.HorizVerti)
                     {
-                        if (Mathf.Abs(_dashDirecton.x) >= Mathf.Abs(_dashDirecton.y))
+                        if (Mathf.Abs(_dashDirection.x) >= Mathf.Abs(_dashDirection.y))
                         {
-                            if (_dashDirecton.x > 0) _rb.velocity = Vector2.right * dashSpeed;
+                            if (_dashDirection.x > 0) _rb.velocity = Vector2.right * dashSpeed;
                             else _rb.velocity = Vector2.left * dashSpeed;
                         }
                         else
                         {
-                            if (_dashDirecton.y > 0) _rb.velocity = Vector2.up * dashSpeed;
+                            if (_dashDirection.y > 0) _rb.velocity = Vector2.up * dashSpeed;
                             else _rb.velocity = Vector2.down * dashSpeed;
                         }
                     }
@@ -198,23 +198,23 @@ namespace Player
                     //Eight direction calculation
                     else if (dashAllDirections == DashAllDirections.HorizVertiDiago)
                     {
-                        if (Mathf.Abs(_dashDirecton.x) >= 2 * Mathf.Abs(_dashDirecton.y))
+                        if (Mathf.Abs(_dashDirection.x) >= 2 * Mathf.Abs(_dashDirection.y))
                         {
-                            if (_dashDirecton.x > 0) _rb.velocity = Vector2.right * dashSpeed;
+                            if (_dashDirection.x > 0) _rb.velocity = Vector2.right * dashSpeed;
                             else _rb.velocity = Vector2.left * dashSpeed;
                         }
-                        else if (Mathf.Abs(_dashDirecton.y) >= 2 * Mathf.Abs(_dashDirecton.x))
+                        else if (Mathf.Abs(_dashDirection.y) >= 2 * Mathf.Abs(_dashDirection.x))
                         {
-                            if (_dashDirecton.y > 0) _rb.velocity = Vector2.up * dashSpeed;
+                            if (_dashDirection.y > 0) _rb.velocity = Vector2.up * dashSpeed;
                             else _rb.velocity = Vector2.down * dashSpeed;
                         }
                         else
                         {
                             float x, y;
 
-                            if (_dashDirecton.x > 0) x = 1;
+                            if (_dashDirection.x > 0) x = 1;
                             else x = -1;
-                            if (_dashDirecton.y > 0) y = 1;
+                            if (_dashDirection.y > 0) y = 1;
                             else y = -1;
 
                             _rb.velocity = new Vector2(x / Mathf.Sqrt(2), y / Mathf.Sqrt(2)) * dashSpeed;

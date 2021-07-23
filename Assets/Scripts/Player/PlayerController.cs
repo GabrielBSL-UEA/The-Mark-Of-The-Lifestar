@@ -42,9 +42,9 @@ namespace Player
             {
                 _playerMovement.MovementTranslator(
                     _playerInputs.MovementDirection,
-                    _playerInputs.JumpHolded,
+                    _playerInputs.JumpHeld,
                     _playerInputs.HasJumped,
-                    _playerInputs.DashPerfomed,
+                    _playerInputs.DashPerformed,
                     _playerCollision.IsWallSliding,
                     _playerCombat.IsAttacking,
                     _playerHealth.IsStunned);
@@ -145,9 +145,9 @@ namespace Player
             return _playerMovement.DashDelayTimer;
         }
 
-        public bool GetDashPerfomed()
+        public bool GetDashPerformed()
         {
-            return _playerInputs.DashPerfomed;
+            return _playerInputs.DashPerformed;
         }
 
         public bool GetDashState()

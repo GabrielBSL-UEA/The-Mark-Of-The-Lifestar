@@ -49,7 +49,7 @@ namespace Player
         {
             float direction = _playerController.GetMovementInputs().x;
 
-            if (Mathf.Abs(direction) > _playerController.GetDeadZone() && (!_playerController.GetPlayerIsAttacking() || _playerController.GetDashPerfomed())) Flip(direction > 0);
+            if (Mathf.Abs(direction) > _playerController.GetDeadZone() && (!_playerController.GetPlayerIsAttacking() || _playerController.GetDashPerformed())) Flip(direction > 0);
 
             if (_blinking) MakePlayerBlink();
         }

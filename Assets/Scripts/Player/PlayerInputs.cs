@@ -27,9 +27,9 @@ namespace Player
 
         public Vector2 MovementDirection { get; private set; }
         public Vector2 DashDirectionCache { get; private set; }
-        public bool JumpHolded { get; private set; }
+        public bool JumpHeld { get; private set; }
         public bool HasJumped { get; private set; }
-        public bool DashPerfomed { get; private set; }
+        public bool DashPerformed { get; private set; }
 
         private bool _hasPressedJump;
         private bool _jumpBuffer;
@@ -65,7 +65,7 @@ namespace Player
 
         private void Update()
         {
-            if (_jumpHoldTime >= jumpHoldDuration) JumpHolded = false;
+            if (_jumpHoldTime >= jumpHoldDuration) JumpHeld = false;
             else _jumpHoldTime += Time.deltaTime;
 
             if(_jumpBufferTimer < jumpBufferTime && _hasPressedJump && CanJump()) ConfirmJump();
@@ -86,7 +86,7 @@ namespace Player
 
             else if (ctx.canceled)
             {
-                JumpHolded = false;
+                JumpHeld = false;
                 _jumpBuffer = false;
                 StartCoroutine(JumpReleasedDelay(minimalJumpTime - _jumpHoldTime));
             }
@@ -94,7 +94,7 @@ namespace Player
 
         private void ConfirmJump()
         {
-            JumpHolded = _jumpBuffer;
+            JumpHeld = _jumpBuffer;
             HasJumped = true;
             _hasPressedJump = false;
             _jumpBufferTimer = 0;
@@ -104,7 +104,7 @@ namespace Player
         private void ConfirmDash()
         {
             _dashBufferTimer = 0;
-            DashPerfomed = true;
+            DashPerformed = true;
             _hasPressedDash = false;
             DashDirectionCache = MovementDirection;
         }
@@ -159,7 +159,7 @@ namespace Player
 
         public void ResetInputCounters()
         {
-            if (DashPerfomed) return;
+            if (DashPerformed) return;
 
             _airJumpCounter = 0;
             _airDashCounter = 0;
@@ -169,7 +169,7 @@ namespace Player
         {
             if (value)
             {
-                DashPerfomed = false;
+                DashPerformed = false;
                 _inputActions.Enable();
             }
             else _inputActions.Disable();
